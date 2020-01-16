@@ -82,4 +82,12 @@ export class LinuxNativeCommands {
 		this.createScriptSpawn("findLinuxInclude.sh", selected,
 			pathSrc, onStdout, onSterr);
 	}
+
+	checkDeps(pathSrc?: string, onStdout?: Function,
+		onSterr?: Function): void
+	{
+		// resolve and run
+		this.createScriptSpawn("checkDeps.sh", "null", pathSrc,
+			onStdout, onSterr);
+	}
 }

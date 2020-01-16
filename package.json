@@ -1,7 +1,9 @@
 {
 	"name": "linuxkerneldev",
 	"displayName": "Embedded Linux Kernel Dev",
-	"description": "Tool to help find documentation and device tree matching on device driver source code by compatible strings",
+	"description": "Tool to help find documentation, device tree matching on device driver source code, by compatible strings",
+	"publisher": "microhobby",
+	"repository": {"url": "https://github.com/microhobby/linuxkerneldev"},
 	"version": "0.0.1",
 	"engines": {
 		"vscode": "^1.41.0"
@@ -14,110 +16,145 @@
 		"onLanguage:c",
 		"onLanguage:dts",
 		"onLanguage:dtsi",
-		"onView:linuxDevCmdView"
+		"onView:linuxDevCmdView",
+		"onCommand:embeddedLinuxDev.reloadCTags",
+		"onCommand:embeddedLinuxDev.regenerateCTags"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
 		"commands": [
 			{
-				"command": "embeddedLinuxDev.helloWorld",
-				"title": "Hello World"
+				"command": "embeddedLinuxDev.regenerateCTags",
+				"title": "Ctags Support: regenerate tags file"
+			},
+			{
+				"command": "embeddedLinuxDev.reloadCTags",
+				"title": "Ctags Support: reloadCtags"
 			},
 			{
 				"command": "embeddedLinuxDev.findAndOpenDeviceTreeDoc",
 				"title": "Device Tree Doc from compatible",
 				"icon": {
-				  "light": "res/boolean.svg",
-				  "dark": "res/boolean.svg"
+					"light": "res/boolean.svg",
+					"dark": "res/boolean.svg"
 				}
 			},
 			{
 				"command": "embeddedLinuxDev.findAndOpenDeviceTreeMatchDriver",
 				"title": "Device Driver Match from compatible",
 				"icon": {
-				  "light": "res/boolean.svg",
-				  "dark": "res/boolean.svg"
+					"light": "res/boolean.svg",
+					"dark": "res/boolean.svg"
 				}
 			},
 			{
 				"command": "embeddedLinuxDev.openArmDtsDtsi",
 				"title": "ARM dts/dtsi from selected",
 				"icon": {
-				  "light": "res/boolean.svg",
-				  "dark": "res/boolean.svg"
+					"light": "res/boolean.svg",
+					"dark": "res/boolean.svg"
 				}
 			},
 			{
 				"command": "embeddedLinuxDev.openArm64DtsDtsi",
 				"title": "ARM64 dts/dtsi from selected",
 				"icon": {
-				  "light": "res/boolean.svg",
-				  "dark": "res/boolean.svg"
+					"light": "res/boolean.svg",
+					"dark": "res/boolean.svg"
 				}
 			},
 			{
 				"command": "embeddedLinuxDev.openLinuxInclude",
 				"title": "Include/linux from selected",
 				"icon": {
-				  "light": "res/boolean.svg",
-				  "dark": "res/boolean.svg"
+					"light": "res/boolean.svg",
+					"dark": "res/boolean.svg"
 				}
 			}
 		],
+		"configuration": {
+			"title": "Universal CTags",
+			"properties": {
+				"ctags.excludePatterns": {
+					"type": "array",
+					"items": "string",
+					"markdownDescription": "An array of file and directory exclude patterns to be considered when (re)generating tags. Each pattern is passed to ctags as --exclude=_pattern_."
+				},
+				"ctags.languages": {
+					"type": "array",
+					"items": "string",
+					"markdownDescription": "An array of languages to be considered when (re)generating tags. The languages are passed to ctags as --languages=_lang1_,_lang2_. See ctags --list-languages for valid values.",
+					"default": [
+						"C",
+						"C++",
+						"DTS"
+					]
+				},
+				"ctags.regenerateOnSave": {
+					"type": "boolean",
+					"markdownDescription": "If true, then ctags will be regenerated and reindexed on save.",
+					"default": false
+				}
+			}
+		},
 		"viewsContainers": {
 			"activitybar": [
-			{
-			    "id": "linuxdev-options",
-			    "title": "Embedded Linux Dev",
-			    "icon": "res/embeddedLinux.svg"
-			}
-		]},
+				{
+					"id": "linuxdev-options",
+					"title": "Embedded Linux Dev",
+					"icon": "res/embeddedLinux.svg"
+				}
+			]
+		},
 		"menus": {
 			"view/item/context": [
-			{
-			    "command": "embeddedLinuxDev.findAndOpenDeviceTreeDoc",
-			    "when": "view == linuxDevCmdView",
-			    "group": "navigation"
-			},
-			{
-			    "command": "embeddedLinuxDev.findAndOpenDeviceTreeMatchDriver",
-			    "when": "view == linuxDevCmdView",
-			    "group": "navigation"
-			}],
+				{
+					"command": "embeddedLinuxDev.findAndOpenDeviceTreeDoc",
+					"when": "view == linuxDevCmdView",
+					"group": "navigation"
+				},
+				{
+					"command": "embeddedLinuxDev.findAndOpenDeviceTreeMatchDriver",
+					"when": "view == linuxDevCmdView",
+					"group": "navigation"
+				}
+			],
 			"editor/context": [
-			{
-				"command": "embeddedLinuxDev.findAndOpenDeviceTreeDoc",
-				"when": "resourceLangId == c || resourceLangId == dts || resourceLangId == dtsi",
-				"group": "LinuxGroup1@1"
-			},
-			{
-				"command": "embeddedLinuxDev.findAndOpenDeviceTreeMatchDriver",
-				"when": "resourceLangId == c || resourceLangId == dts || resourceLangId == dtsi",
-				"group": "LinuxGroup1@2"
-			},
-			{
-				"command": "embeddedLinuxDev.openArmDtsDtsi",
-				"when": "resourceLangId == c || resourceLangId == dts || resourceLangId == dtsi",
-				"group": "LinuxGroup2@1"
-			},
-			{
-				"command": "embeddedLinuxDev.openArm64DtsDtsi",
-				"when": "resourceLangId == c || resourceLangId == dts || resourceLangId == dtsi",
-				"group": "LinuxGroup2@2"
-			},
-			{
-				"command": "embeddedLinuxDev.openLinuxInclude",
-				"when": "resourceLangId == c || resourceLangId == dts || resourceLangId == dtsi",
-				"group": "LinuxGroup3@1"
-			}]
+				{
+					"command": "embeddedLinuxDev.findAndOpenDeviceTreeDoc",
+					"when": "resourceLangId == c || resourceLangId == dts || resourceLangId == dtsi",
+					"group": "LinuxGroup1@1"
+				},
+				{
+					"command": "embeddedLinuxDev.findAndOpenDeviceTreeMatchDriver",
+					"when": "resourceLangId == c || resourceLangId == dts || resourceLangId == dtsi",
+					"group": "LinuxGroup1@2"
+				},
+				{
+					"command": "embeddedLinuxDev.openArmDtsDtsi",
+					"when": "resourceLangId == c || resourceLangId == dts || resourceLangId == dtsi",
+					"group": "LinuxGroup2@1"
+				},
+				{
+					"command": "embeddedLinuxDev.openArm64DtsDtsi",
+					"when": "resourceLangId == c || resourceLangId == dts || resourceLangId == dtsi",
+					"group": "LinuxGroup2@2"
+				},
+				{
+					"command": "embeddedLinuxDev.openLinuxInclude",
+					"when": "resourceLangId == c || resourceLangId == dts || resourceLangId == dtsi",
+					"group": "LinuxGroup3@1"
+				}
+			]
 		},
 		"views": {
 			"linuxdev-options": [
-			{
-			    "id": "linuxDevCmdView",
-			    "name": "Commands"
-			}
-		]}
+				{
+					"id": "linuxDevCmdView",
+					"name": "Commands"
+				}
+			]
+		}
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",
@@ -136,5 +173,14 @@
 		"typescript": "^3.6.4",
 		"tslint": "^5.20.0",
 		"vscode-test": "^1.2.2"
-	}
+	},
+	"dependencies": {
+		"textindexer": "0.0.7"
+	},
+	"extensionDependencies": [
+		"luveti.kconfig",
+		"plorefice.devicetree"
+	],
+	"icon": "res/embeddedLinux.png",
+	"license": "MIT"
 }

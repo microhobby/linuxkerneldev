@@ -80,6 +80,16 @@ export class LinuxDevCmdProvider
 					arguments: []
 				}));
 
+			// generate the ctags
+			cmds.push(new CmdOption("Generate CTags from project", "cmd5",
+				vscode.TreeItemCollapsibleState.None,
+				"",
+				{
+					command: "embeddedLinuxDev.regenerateCTags",
+					title: '',
+					arguments: []
+				}));
+
 			// return
 			resolve(cmds);
 		});
@@ -112,14 +122,14 @@ export class CmdOption extends vscode.TreeItem {
 			'..', 
 			'..', 
 			'res', 
-			'search.svg'
+			'boolean.svg'
 		),
 		dark: path.join(
 			__filename, 
 			'..', 
 			'..', 
 			'res', 
-			'search.svg'
+			'boolean.svg'
 		)
 	};
 

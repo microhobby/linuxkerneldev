@@ -1,44 +1,160 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
+// ****************************************************************************
+// ****************************************************************************
+// ****************************************************************************
+'use strict';
+import * as path from 'path';
 import * as vscode from 'vscode';
+import * as ctags from './ctags';
+import * as util from './util';
+// non ctags related
 import { LinuxDevCmdProvider, CmdOption } from './cmdNodeProvider'
 import { LinuxNativeCommands } from './LinuxNativeCommands';
 
-// this method is called when your extension is activated
-// your extension is activated the very first time the command is executed
+const tagsfile = '.vscode-ctags';
+let tags: ctags.CTags;
+
+class CTagsDefinitionProvider implements vscode.DefinitionProvider {
+	public provideDefinition(
+		document: vscode.TextDocument,
+		position: vscode.Position,
+		token: vscode.CancellationToken
+	): vscode.ProviderResult<vscode.Definition> {
+		const query = document.getText(
+			document.getWordRangeAtPosition(position));
+		return this.resolveDefinitions(query);
+	}
+
+	private async resolveDefinitions(query: string): Promise<vscode.Definition> {
+		const matches = await tags.lookup(query);
+		if (!matches) {
+			util.log(`"${query}" has no matches.`);
+			return [];
+		}
+		return matches.map(match => {
+			util.log(`"${query}" matches ${match.path}:${match.lineno}`);
+			return new vscode.Location(
+				vscode.Uri.file(match.path),
+				new vscode.Position(match.lineno, 0)
+			);
+		});
+	}
+}
+
+class CTagsHoverProvider implements vscode.HoverProvider {
+	public provideHover(
+		document: vscode.TextDocument,
+		position: vscode.Position,
+		token: vscode.CancellationToken
+	): vscode.ProviderResult<vscode.Hover> {
+		const query = document.getText(
+			document.getWordRangeAtPosition(position));
+		return this.resolveHover(query);
+	}
+
+	private async resolveHover(query: string): Promise<vscode.Hover | null> {
+		const matches = await tags.lookup(query);
+		if (!matches) {
+			util.log(`"${query}" has no matches.`);
+			return null;
+		}
+		util.log(`"${query}" has ${matches.length} matches.`);
+		const summary = matches.map(match => {
+			return (
+				path.relative(vscode.workspace.rootPath || '', match.path) +
+				':' +
+				match.lineno
+			);
+		});
+		return new vscode.Hover(new vscode.MarkdownString(
+						summary.join('  \n')));
+	}
+}
+
+class CTagsCompletionProvider implements vscode.CompletionItemProvider {
+	public provideCompletionItems(
+		document: vscode.TextDocument,
+		position: vscode.Position,
+		token: vscode.CancellationToken,
+		context: vscode.CompletionContext
+	): vscode.ProviderResult<vscode.CompletionItem[] | vscode.CompletionList> {
+		const prefix = document
+			.getText(document.getWordRangeAtPosition(position));
+		return this.resolveCompletion(prefix);
+	}
+
+	private async resolveCompletion(
+		prefix: string
+	): Promise<vscode.CompletionItem[] | null> {
+		const matches = await tags.lookupCompletions(prefix);
+		if (!matches) {
+			util.log(`"${prefix}" has no matches.`);
+			return null;
+		}
+		util.log(`"${prefix}" has ${matches.length} matches.`);
+		return matches.map(match => {
+			return new vscode.CompletionItem(match.name);
+		});
+	}
+}
+
+function regenerateArgs(): string[] {
+	const config = vscode.workspace.getConfiguration('ctags');
+	const excludes = config
+		.get<string[]>('excludePatterns', [])
+		.map((pattern: string) => {
+			return '--exclude=' + pattern;
+		})
+		.join(' ');
+	const languages =
+		'--languages=' + config.get<string[]>('languages', ['all'])
+			.join(',');
+	return [languages, excludes];
+}
+
+function regenerateCTags() {
+	const args = regenerateArgs();
+	const title =
+		args && args.length
+			? `Generating CTags index (${args.join(' ')})`
+			: 'Generating CTags index';
+	return vscode.window.withProgress(
+		{
+			location: vscode.ProgressLocation.Window,
+			title
+		},
+		(progress, token) => {
+			return tags.regenerate(regenerateArgs()).catch(err => {
+				vscode.window.setStatusBarMessage(
+					'Generating CTags failed: ' + err);
+			});
+		}
+	);
+}
+
 export function activate(context: vscode.ExtensionContext) {
+	util.log('extension activated.');
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "linuxkerneldev" is now active!');
-
+	// time to work
 	// tree view
 	const cmdNodesProvider =
 		new LinuxDevCmdProvider(vscode.workspace.rootPath);
 	vscode.window.registerTreeDataProvider('linuxDevCmdView',
-						cmdNodesProvider);
-	
+		cmdNodesProvider);
+
 	// scripts wrapper
 	const nativeCmdsExecuter = new LinuxNativeCommands();
 
-	/*function getSelectedString(): string
-	{
-		const editor = vscode.window.activeTextEditor;
-
-		if (editor != undefined) {
-			let start = editor.selection.start;
-			let end = editor.selection.end;
-			let highlight = editor.document.getText(
-				new vscode.Range(start, end));
-
-			return highlight;
+	// check for deps
+	nativeCmdsExecuter.checkDeps(vscode.workspace.rootPath,
+		(data: string) => {
+			vscode.window.setStatusBarMessage(data);
+		}, (err: string) => {
+			vscode.window.showErrorMessage(`${err} \n \
+				please: apt-get install universal-ctags`);
 		}
+	);
 
-		return "";
-	}*/
-
-	function getSelectedString(): string
-	{
+	function getSelectedString(): string {
 		const editor = vscode.window.activeTextEditor;
 
 		if (editor != undefined) {
@@ -64,7 +180,7 @@ export function activate(context: vscode.ExtensionContext) {
 				cend--;
 			}
 			auxStart = cstart;
-			
+
 			cstart = start.character;
 			cend = cstart;
 			yeap = true;
@@ -93,8 +209,7 @@ export function activate(context: vscode.ExtensionContext) {
 		return "";
 	}
 
-	function getSelectedInclude(): string
-	{
+	function getSelectedInclude(): string {
 		const editor = vscode.window.activeTextEditor;
 
 		if (editor != undefined) {
@@ -120,7 +235,7 @@ export function activate(context: vscode.ExtensionContext) {
 				cend--;
 			}
 			auxStart = cstart;
-			
+
 			cstart = start.character;
 			cend = cstart;
 			yeap = true;
@@ -149,92 +264,167 @@ export function activate(context: vscode.ExtensionContext) {
 		return "";
 	}
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	let disposable = vscode.commands.registerCommand('embeddedLinuxDev.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
+	// ctags
+	tags = new ctags.CTags(vscode.workspace.rootPath || '', tagsfile);
+	tags
+		.reindex()
+		.then(() => {
+			vscode.window.setStatusBarMessage('CTags index loaded',
+					2000);
+		})
+		.catch(() => {
+			return regenerateCTags();
+		});
 
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World!');
-	});
+	const definitionsProvider = new CTagsDefinitionProvider();
+	vscode.languages.registerDefinitionProvider(
+		{ scheme: 'file', language: 'cpp' },
+		definitionsProvider
+	);
+	vscode.languages.registerDefinitionProvider(
+		{ scheme: 'file', language: 'c' },
+		definitionsProvider
+	);
+	vscode.languages.registerDefinitionProvider(
+		{ scheme: 'file', language: 'dts' },
+		definitionsProvider
+	);
+	vscode.languages.registerDefinitionProvider(
+		{ scheme: 'file', language: 'dtsi' },
+		definitionsProvider
+	);
 
+	const hoverProvider = new CTagsHoverProvider();
+	vscode.languages.registerHoverProvider(
+		{ scheme: 'file', language: 'c' },
+		hoverProvider
+	);
+	vscode.languages.registerHoverProvider(
+		{ scheme: 'file', language: 'cpp' },
+		hoverProvider
+	);
+	vscode.languages.registerHoverProvider(
+		{ scheme: 'file', language: 'dts' },
+		hoverProvider
+	);
+	vscode.languages.registerHoverProvider(
+		{ scheme: 'file', language: 'dtsi' },
+		hoverProvider
+	);
+
+	const completionProvider = new CTagsCompletionProvider();
+	vscode.languages.registerCompletionItemProvider(
+		{ scheme: 'file', language: 'c' },
+		completionProvider
+	);
+	vscode.languages.registerCompletionItemProvider(
+		{ scheme: 'file', language: 'cpp' },
+		completionProvider
+	);
+	vscode.languages.registerCompletionItemProvider(
+		{ scheme: 'file', language: 'dts' },
+		completionProvider
+	);
+	vscode.languages.registerCompletionItemProvider(
+		{ scheme: 'file', language: 'dtsi' },
+		completionProvider
+	);
+
+	const regenerateCTagsCommand = vscode.commands.registerCommand(
+		'embeddedLinuxDev.regenerateCTags',
+		() => {
+			regenerateCTags();
+		}
+	);
+
+	// tree
 	// here begins the real code
 	vscode.commands.registerCommand(
 		'embeddedLinuxDev.findAndOpenDeviceTreeDoc', () => {
-	
-		console.log("bosta");
 
-		// call the grep script
-		nativeCmdsExecuter.findAndOpenDeviceTreeDoc(
-			getSelectedString(),
-			vscode.workspace.rootPath,
-			(data: string) => {
-				vscode.window.setStatusBarMessage(data);
-			},
-			(err: string) => {
-				vscode.window.showErrorMessage(err);
-			});
-	});
+			console.log("bosta");
+
+			// call the grep script
+			nativeCmdsExecuter.findAndOpenDeviceTreeDoc(
+				getSelectedString(),
+				vscode.workspace.rootPath,
+				(data: string) => {
+					vscode.window.setStatusBarMessage(data);
+				},
+				(err: string) => {
+					vscode.window.showErrorMessage(err);
+				});
+		});
 
 	vscode.commands.registerCommand(
 		'embeddedLinuxDev.findAndOpenDeviceTreeMatchDriver', () => {
-		// call the grep script
-		nativeCmdsExecuter.findDeviceTreeMatch(
-			getSelectedString(),
-			vscode.workspace.rootPath,
-			(data: string) => {
-				vscode.window.setStatusBarMessage(data);
-			},
-			(err: string) => {
-				vscode.window.showErrorMessage(err);
-			});
-	});
+			// call the grep script
+			nativeCmdsExecuter.findDeviceTreeMatch(
+				getSelectedString(),
+				vscode.workspace.rootPath,
+				(data: string) => {
+					vscode.window.setStatusBarMessage(data);
+				},
+				(err: string) => {
+					vscode.window.showErrorMessage(err);
+				});
+		});
 
 	vscode.commands.registerCommand(
 		'embeddedLinuxDev.openArmDtsDtsi', () => {
-		// call the grep script
-		nativeCmdsExecuter.findArmDts(
-			getSelectedString(),
-			vscode.workspace.rootPath,
-			(data: string) => {
-				vscode.window.setStatusBarMessage(data);
-			},
-			(err: string) => {
-				vscode.window.showErrorMessage(err);
-			});
-	});
+			// call the grep script
+			nativeCmdsExecuter.findArmDts(
+				getSelectedString(),
+				vscode.workspace.rootPath,
+				(data: string) => {
+					vscode.window.setStatusBarMessage(data);
+				},
+				(err: string) => {
+					vscode.window.showErrorMessage(err);
+				});
+		});
 
 	vscode.commands.registerCommand(
 		'embeddedLinuxDev.openArm64DtsDtsi', () => {
-		// call the grep script
-		nativeCmdsExecuter.findArm64Dts(
-			getSelectedString(),
-			vscode.workspace.rootPath,
-			(data: string) => {
-				vscode.window.setStatusBarMessage(data);
-			},
-			(err: string) => {
-				vscode.window.showErrorMessage(err);
-			});
-	});
+			// call the grep script
+			nativeCmdsExecuter.findArm64Dts(
+				getSelectedString(),
+				vscode.workspace.rootPath,
+				(data: string) => {
+					vscode.window.setStatusBarMessage(data);
+				},
+				(err: string) => {
+					vscode.window.showErrorMessage(err);
+				});
+		});
 
 	vscode.commands.registerCommand(
 		'embeddedLinuxDev.openLinuxInclude', () => {
-		// call the grep script
-		nativeCmdsExecuter.findLinuxInclude(
-			getSelectedInclude(),
-			vscode.workspace.rootPath,
-			(data: string) => {
-				vscode.window.setStatusBarMessage(data);
-			},
-			(err: string) => {
-				vscode.window.showErrorMessage(err);
-			});
-	});
+			// call the grep script
+			nativeCmdsExecuter.findLinuxInclude(
+				getSelectedInclude(),
+				vscode.workspace.rootPath,
+				(data: string) => {
+					vscode.window.setStatusBarMessage(data);
+				},
+				(err: string) => {
+					vscode.window.showErrorMessage(err);
+				});
+		});
 
-	context.subscriptions.push(disposable);
+	//context.subscriptions.push(disposable);
+	// tree
+
+	context.subscriptions.push(regenerateCTagsCommand);
+
+	vscode.workspace.onDidSaveTextDocument(event => {
+		util.log('saved', event.fileName, event.languageId);
+		const config = vscode.workspace.getConfiguration('ctags');
+		const autoRegenerate = config.get<boolean>('regenerateOnSave');
+		if (autoRegenerate) {
+			regenerateCTags();
+		}
+	});
 }
 
-// this method is called when your extension is deactivated
-export function deactivate() {}
+export function deactivate() { }
