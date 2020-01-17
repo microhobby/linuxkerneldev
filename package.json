@@ -1,10 +1,17 @@
 {
 	"name": "linuxkerneldev",
 	"displayName": "Embedded Linux Kernel Dev",
-	"description": "Tool to help find documentation, device tree matching on device driver source code, by compatible strings",
+	"description": "Tool to help find documentation and device tree matching on device driver source code, by device tree binding compatible strings.",
 	"publisher": "microhobby",
 	"repository": {"url": "https://github.com/microhobby/linuxkerneldev"},
-	"version": "0.0.1",
+	"version": "0.0.4",
+	"keywords": [
+		"ctags",
+		"kernel",
+		"linux",
+		"device",
+		"tree"
+	],
 	"engines": {
 		"vscode": "^1.41.0"
 	},
@@ -49,7 +56,7 @@
 			},
 			{
 				"command": "embeddedLinuxDev.openArmDtsDtsi",
-				"title": "ARM dts/dtsi from selected",
+				"title": "ARM dts/dtsi from include",
 				"icon": {
 					"light": "res/boolean.svg",
 					"dark": "res/boolean.svg"
@@ -57,7 +64,7 @@
 			},
 			{
 				"command": "embeddedLinuxDev.openArm64DtsDtsi",
-				"title": "ARM64 dts/dtsi from selected",
+				"title": "ARM64 dts/dtsi from include",
 				"icon": {
 					"light": "res/boolean.svg",
 					"dark": "res/boolean.svg"
@@ -181,6 +188,6 @@
 		"luveti.kconfig",
 		"plorefice.devicetree"
 	],
-	"icon": "res/embeddedLinux.png",
+	"icon": "res/icon.png",
 	"license": "MIT"
 }
