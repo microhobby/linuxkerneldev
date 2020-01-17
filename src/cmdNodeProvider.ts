@@ -51,7 +51,7 @@ export class LinuxDevCmdProvider
 				}));
 
 			// dts/dtsi
-			cmds.push(new CmdOption("ARM dts/dtsi from selected", "cmd2",
+			cmds.push(new CmdOption("ARM dts/dtsi from include", "cmd2",
 				vscode.TreeItemCollapsibleState.None,
 				"",
 				{
@@ -61,7 +61,7 @@ export class LinuxDevCmdProvider
 				}));
 
 			// arm64 dts/dtsi
-			cmds.push(new CmdOption("ARM64 dts/dtsi from selected", "cmd3",
+			cmds.push(new CmdOption("ARM64 dts/dtsi from include", "cmd3",
 				vscode.TreeItemCollapsibleState.None,
 				"",
 				{
