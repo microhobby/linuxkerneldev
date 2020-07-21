@@ -4,8 +4,16 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 export class LinuxNativeCommands {
+
+	private insider:string = "code";
+
 	constructor()
-	{}
+	{
+		// check if we are runnin on vs code insiders
+		if (vscode.version.indexOf("insider") !== -1) {
+			this.insider = "code-insiders";
+		}
+	}
 
 	private createScriptSpawn(name: string, selected: string,
 		pathSrc?: string, onStdout?: Function, onSterr?: Function): void
@@ -25,7 +33,7 @@ export class LinuxNativeCommands {
 			name
 		);
 
-		let child: any = spawn(scriptPath, [pathSrc, selected]);
+		let child: any = spawn(scriptPath, [pathSrc, selected, this.insider]);
 
 		child.stdout.on('data', (data: string) => {
 			console.log(`stdout: ${data}`);

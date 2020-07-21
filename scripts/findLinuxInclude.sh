@@ -6,7 +6,7 @@ echo "Searching 🏃 (Embedded Linux Dev)"
 FILE=$1/include/$2
 if [ -f "$FILE" ]; then
 	echo "Opening 📜 (Embedded Linux Dev)"
-	code $FILE
+	eval "$3 $FILE"
 else
 	echo "Not found $FILE 😢 (Embedded Linux Dev)" 1>&2
 	exit 42

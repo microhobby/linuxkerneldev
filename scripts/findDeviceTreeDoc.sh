@@ -9,7 +9,7 @@ fileList=(${grepRet//:/ })
 # open
 if [ "$fileList" != "" ]; then
 	echo "Opening 📜 (Embedded Linux Dev)"
-	code $fileList
+	eval "$3 $fileList"
 else
 	echo "Not found match for $2 😢 (Embedded Linux Dev)" 1>&2
 	exit 42
