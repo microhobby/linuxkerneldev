@@ -3,8 +3,10 @@
 	"displayName": "Embedded Linux Kernel Dev",
 	"description": "Tool to help find documentation and device tree matching on device driver source code, by device tree binding compatible strings.",
 	"publisher": "microhobby",
-	"repository": {"url": "https://github.com/microhobby/linuxkerneldev"},
-	"version": "0.0.4",
+	"repository": {
+		"url": "https://github.com/microhobby/linuxkerneldev"
+	},
+	"version": "0.1.5",
 	"keywords": [
 		"ctags",
 		"kernel",
