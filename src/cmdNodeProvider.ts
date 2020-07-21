@@ -17,7 +17,7 @@ export class LinuxDevCmdProvider
 
 	getChildren(element?: vscode.TreeItem): Thenable<vscode.TreeItem[]> {
 		/* first time */
-		if (element == undefined) {
+		if (element === undefined) {
 			/* check the network for Toradex devices */
 			return this.getCmds();
 		}

@@ -10,9 +10,10 @@ export class LinuxNativeCommands {
 	private createScriptSpawn(name: string, selected: string,
 		pathSrc?: string, onStdout?: Function, onSterr?: Function): void
 	{
-		if (selected == "") {
-			if (onSterr != undefined)
+		if (selected === "") {
+			if (onSterr !== undefined) {
 				onSterr("🤔 Are you sure this selection is an include or string?");
+			}
 			return;
 		}
 
@@ -28,14 +29,16 @@ export class LinuxNativeCommands {
 
 		child.stdout.on('data', (data: string) => {
 			console.log(`stdout: ${data}`);
-			if (onStdout != undefined)
+			if (onStdout !== undefined) {
 				onStdout(`${data}`);
+			}
 		});
 
 		child.stderr.on('data', (data: string) => {
 			console.error(`stderr: ${data}`);
-			if (onSterr != undefined)
+			if (onSterr !== undefined) {
 				onSterr(`${data}`);
+			}
 		});
 		
 		child.on('close', (code: any) => {
