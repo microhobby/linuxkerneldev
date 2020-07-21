@@ -2,6 +2,10 @@
 
 All notable changes to the "linuxkerneldev" extension will be documented in this file.
 
+## [0.1.6]
+
+- Update the authors on license
+
 ## [0.1.5]
 
 - Add support for VS Code Insiders
