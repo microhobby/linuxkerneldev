@@ -2,6 +2,11 @@
 
 All notable changes to the "linuxkerneldev" extension will be documented in this file.
 
+## [0.2.0]
+
+- Add supoprt for Kconfig, defconfig, .config navigation
+- Use own Kconfig syntax
+
 ## [0.1.6]
 
 - Update the authors on license
