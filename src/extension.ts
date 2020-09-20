@@ -293,6 +293,14 @@ export function activate(context: vscode.ExtensionContext) {
 		{ scheme: 'file', language: 'dtsi' },
 		definitionsProvider
 	);
+	vscode.languages.registerDefinitionProvider(
+		{ scheme: 'file', language: 'kconfig' },
+		definitionsProvider
+	);
+	vscode.languages.registerDefinitionProvider(
+		{ scheme: 'file', language: 'makefile' },
+		definitionsProvider
+	);
 
 	const hoverProvider = new CTagsHoverProvider();
 	vscode.languages.registerHoverProvider(
@@ -311,6 +319,14 @@ export function activate(context: vscode.ExtensionContext) {
 		{ scheme: 'file', language: 'dtsi' },
 		hoverProvider
 	);
+	vscode.languages.registerHoverProvider(
+		{ scheme: 'file', language: 'kconfig' },
+		hoverProvider
+	);
+	vscode.languages.registerHoverProvider(
+		{ scheme: 'file', language: 'makefile' },
+		hoverProvider
+	);
 
 	const completionProvider = new CTagsCompletionProvider();
 	vscode.languages.registerCompletionItemProvider(
@@ -327,6 +343,14 @@ export function activate(context: vscode.ExtensionContext) {
 	);
 	vscode.languages.registerCompletionItemProvider(
 		{ scheme: 'file', language: 'dtsi' },
+		completionProvider
+	);
+	vscode.languages.registerCompletionItemProvider(
+		{ scheme: 'file', language: 'kconfig' },
+		completionProvider
+	);
+	vscode.languages.registerCompletionItemProvider(
+		{ scheme: 'file', language: 'makefile' },
 		completionProvider
 	);
 

@@ -25,6 +25,8 @@
 		"onLanguage:c",
 		"onLanguage:dts",
 		"onLanguage:dtsi",
+		"onLanguage:kconfig",
+		"onLanguage:makefile",
 		"onView:linuxDevCmdView",
 		"onCommand:embeddedLinuxDev.reloadCTags",
 		"onCommand:embeddedLinuxDev.regenerateCTags"
@@ -96,7 +98,9 @@
 					"default": [
 						"C",
 						"C++",
-						"DTS"
+						"DTS",
+						"Kconfig",
+						"Make"
 					]
 				},
 				"ctags.regenerateOnSave": {
@@ -163,7 +167,29 @@
 					"name": "Commands"
 				}
 			]
-		}
+		},
+		"languages": [
+			{
+				"id": "kconfig",
+				"aliases": [
+					"Kconfig"
+				],
+				"filenamePatterns": [
+					"Kconfig*",
+					"*_defconfig",
+					".config*",
+					"config-*"
+				],
+				"configuration": "./language-configuration.json"
+			}
+		],
+		"grammars": [
+			{
+				"language": "kconfig",
+				"scopeName": "source.kconfig",
+				"path": "./syntaxes/kconfig.tmGrammar.json"
+			}
+		]
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",
@@ -187,7 +213,6 @@
 		"textindexer": "0.0.7"
 	},
 	"extensionDependencies": [
-		"luveti.kconfig",
 		"plorefice.devicetree"
 	],
 	"icon": "res/icon.png",
