@@ -1,7 +1,6 @@
 # Embedded Linux Dev
 
-Tool to help find documentation and device tree matching on device driver source
-code, by device tree binding compatible strings.
+Symbol autocompletion, function and symbol navigation. Supports C, Kconfig, defconfig, .config and device tree files. Plus some automation to match device tree compatibles and open their respective driver or documentation files.
 
 ## Requirements
 
@@ -12,15 +11,13 @@ dependencies on your system:
 - bash
 - universal-ctags
 
-An important detail is to install universal-ctags and not exuberant-ctags.
-Because exuberant does not index device tree files.
+An important detail is to install universal-ctags and not exuberant-ctags to have support to index Kconfig and device tree files.
 
 For a complete development experience for the Linux kernel development, during
 the installation of the extension, the following extensions will be required to
 be installed together:
 
 - [DeviceTree](https://marketplace.visualstudio.com/items?itemName=plorefice.devicetree) (syntax highlighting for device-tree .dts e .dtsi files)
-- [kconfig](https://marketplace.visualstudio.com/items?itemName=luveti.kconfig) (syntax highlighting for Kconfig files)
 
 ## Features
 
@@ -99,9 +96,6 @@ universal-ctags. This file is required to generate the project code navigation:
 
 ![](https://raw.githubusercontent.com/microhobby/linuxkerneldev/master/docs/ctagshover.gif)
 
-The work here was only possible because of the [Exuberant CTags](https://marketplace.visualstudio.com/items?itemName=chriswheeldon.exuberant-ctags) extension, which
-I used as a base. Thanks Chris Wheeldon.
-
 ## Known Issues
 
 You can check and open issues on [Github repo](https://github.com/microhobby/linuxkerneldev/issues)
@@ -109,3 +103,9 @@ You can check and open issues on [Github repo](https://github.com/microhobby/lin
 ## Release Notes
 
 Check the [CHANGELOG.md](https://github.com/microhobby/linuxkerneldev/blob/master/CHANGELOG.md)
+
+## Acknowledgment
+
+The work here was only possible because of the [Exuberant CTags](https://marketplace.visualstudio.com/items?itemName=chriswheeldon.exuberant-ctags) extension, which I used as a base. Thanks Chris Wheeldon.
+
+Thanks also to Trond Einar Snekvik who did a great job in creating a [syntax highlighting for Kconfig](https://github.com/trond-snekvik/vscode-kconfig) that I am using here.
