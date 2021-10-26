@@ -2,6 +2,12 @@
 
 All notable changes to the "linuxkerneldev" extension will be documented in this file.
 
+## [0.3.1]
+
+- Add `ctags.useDocker` configuration (only for Windows)
+- New device tree source syntax highlight
+- Fix audit issues
+
 ## [0.2.0]
 
 - Add supoprt for Kconfig, defconfig, .config navigation
