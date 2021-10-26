@@ -6,7 +6,7 @@
 	"repository": {
 		"url": "https://github.com/microhobby/linuxkerneldev"
 	},
-	"version": "0.2.0",
+	"version": "0.3.0",
 	"keywords": [
 		"ctags",
 		"kernel",
@@ -180,15 +180,35 @@
 					".config*",
 					"config-*"
 				],
-				"configuration": "./language-configuration.json"
-			}
+				"configuration": "syntaxes/kconfig-language.json"
+			},
+			{
+                "id": "dts",
+                "aliases": [
+                    "DeviceTree"
+                ],
+                "configuration": "syntaxes/devicetree-language.json",
+                "extensions": [
+                    ".dts",
+                    ".dtsi",
+                    ".dts_compiled",
+                    ".overlay",
+                    ".dts.pre.tmp"
+                ],
+                "firstLine": "/dts-v1/;"
+            }
 		],
 		"grammars": [
 			{
 				"language": "kconfig",
 				"scopeName": "source.kconfig",
 				"path": "./syntaxes/kconfig.tmGrammar.json"
-			}
+			},
+			{
+                "language": "dts",
+                "scopeName": "source.dts",
+                "path": "./syntaxes/dts.tmLanguage.json"
+            }
 		]
 	},
 	"scripts": {
@@ -212,9 +232,6 @@
 	"dependencies": {
 		"textindexer": "0.0.7"
 	},
-	"extensionDependencies": [
-		"plorefice.devicetree"
-	],
 	"icon": "res/icon.png",
 	"license": "MIT"
 }
