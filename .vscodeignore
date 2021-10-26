@@ -1,0 +1,15 @@
+.vscode/**
+.vscode-test/**
+out/test/**
+out/tests/**
+src/**
+/.gitignore
+node_modules/**/*.ts
+out/**/*.map
+tsconfig.json
+tslint.json
+webpack.config.js
+test-resources/**
+*.tgz
+*.vsix
+containerfiles/**

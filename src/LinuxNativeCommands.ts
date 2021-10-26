@@ -98,7 +98,20 @@ export class LinuxNativeCommands {
 		onSterr?: Function): void
 	{
 		// resolve and run
-		this.createScriptSpawn("checkDeps.sh", "null", pathSrc,
-			onStdout, onSterr);
+		const config = vscode.workspace.getConfiguration('ctags');
+		const useDocker = config.get<boolean>('useDocker');
+
+		if (!useDocker) {
+			this.createScriptSpawn("checkDeps.sh", "null", pathSrc,
+				onStdout, onSterr);
+		} else {
+			this.createScriptSpawn(
+				"checkDepsContainer.ps1",
+				"null",
+				pathSrc,
+				onStdout,
+				onSterr
+			);
+		}
 	}
 }

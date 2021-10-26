@@ -83,33 +83,45 @@
 				}
 			}
 		],
-		"configuration": {
-			"title": "Universal CTags",
-			"properties": {
-				"ctags.excludePatterns": {
-					"type": "array",
-					"items": "string",
-					"markdownDescription": "An array of file and directory exclude patterns to be considered when (re)generating tags. Each pattern is passed to ctags as --exclude=_pattern_."
-				},
-				"ctags.languages": {
-					"type": "array",
-					"items": "string",
-					"markdownDescription": "An array of languages to be considered when (re)generating tags. The languages are passed to ctags as --languages=_lang1_,_lang2_. See ctags --list-languages for valid values.",
-					"default": [
-						"C",
-						"C++",
-						"DTS",
-						"Kconfig",
-						"Make"
-					]
-				},
-				"ctags.regenerateOnSave": {
-					"type": "boolean",
-					"markdownDescription": "If true, then ctags will be regenerated and reindexed on save.",
-					"default": false
+		"configuration": [
+			{
+				"title": "Universal CTags",
+				"properties": {
+					"ctags.excludePatterns": {
+						"type": "array",
+						"items": "string",
+						"markdownDescription": "An array of file and directory exclude patterns to be considered when (re)generating tags. Each pattern is passed to ctags as --exclude=_pattern_."
+					},
+					"ctags.languages": {
+						"type": "array",
+						"items": "string",
+						"markdownDescription": "An array of languages to be considered when (re)generating tags. The languages are passed to ctags as --languages=_lang1_,_lang2_. See ctags --list-languages for valid values.",
+						"default": [
+							"C",
+							"C++",
+							"DTS",
+							"Kconfig",
+							"Make"
+						]
+					},
+					"ctags.regenerateOnSave": {
+						"type": "boolean",
+						"markdownDescription": "If true, then ctags will be regenerated and reindexed on save.",
+						"default": false
+					},
+					"ctags.disable": {
+						"type": "boolean",
+						"markdownDescription": "If true, then ctags will be disabled",
+						"default": false
+					},
+					"ctags.useDocker": {
+						"type": "boolean",
+						"markdownDescription": "If true, then ctags will generated from the seadoglinux/ctags docker image (Windows Only!)",
+						"default": false
+					}
 				}
 			}
-		},
+		],
 		"viewsContainers": {
 			"activitybar": [
 				{

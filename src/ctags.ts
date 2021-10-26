@@ -1,5 +1,6 @@
 'use strict';
 import * as child_process from 'child_process';
+import * as vscode from 'vscode';
 import { rename, stat, Stats } from 'fs';
 import * as path from 'path';
 import { CTagsIndex, Match, Tag } from './ctagsindex';
@@ -62,12 +63,29 @@ export class CTags {
 
   private regenerateFile(args?: string[]): Promise<void> {
     return new Promise((resolve, reject) => {
-      const command = ['ctags']
-	.concat(args || [])
-	//.concat([`-x`, `--_xformat='%{name}\t%{file}\t%{tagaddress}'`])
-        .concat([`-R`])
-	.concat([`-f`, this.filename + '.next', '.'])
-        .join(' ');
+      const config = vscode.workspace.getConfiguration('ctags');
+		  const useDocker = config.get<boolean>('useDocker');
+      let command: string = "";
+
+      if (!useDocker) {
+        command = ['ctags']
+          .concat(args || [])
+          //.concat([`-x`, `--_xformat='%{name}\t%{file}\t%{tagaddress}'`])
+          .concat([`-R`])
+          .concat([`-f`, this.filename + '.next', '.'])
+          .join(' ');
+      } else {
+        command = ['docker']
+          .concat('run', '--rm')
+          .concat('-v', `${vscode.workspace.rootPath!}:/bindmount`)
+          .concat('seadoglinux/ctags')
+          .concat(args || [])
+          //.concat([`-x`, `--_xformat='%{name}\t%{file}\t%{tagaddress}'`])
+          .concat([`-R`])
+          .concat([`-f`, this.filename + '.next', '.'])
+          .join(' ');
+      }
+      
       child_process.exec(
         command,
         { cwd: this.baseDir },
