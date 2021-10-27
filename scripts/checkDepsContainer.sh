@@ -1,3 +1,3 @@
-#!/usr/bin/pwsh-preview -NoProfile 
+#!/bin/bash
 
 docker run --rm -v ${pwd}:${pwd} seadoglinux/ctags --help

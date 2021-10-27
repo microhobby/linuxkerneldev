@@ -1,7 +1,8 @@
 import * as vscode from 'vscode';
-const { spawn } = require('child_process');
 import * as fs from 'fs';
 import * as path from 'path';
+import { spawn } from 'child_process';
+import * as os from 'os';
 
 export class LinuxNativeCommands {
 
@@ -33,7 +34,9 @@ export class LinuxNativeCommands {
 			name
 		);
 
-		let child: any = spawn(scriptPath, [pathSrc, selected, this.insider]);
+		let child: any = spawn(scriptPath, [pathSrc!, selected, this.insider], {
+			shell: true
+		});
 
 		child.stdout.on('data', (data: string) => {
 			console.log(`stdout: ${data}`);
@@ -105,13 +108,23 @@ export class LinuxNativeCommands {
 			this.createScriptSpawn("checkDeps.sh", "null", pathSrc,
 				onStdout, onSterr);
 		} else {
-			this.createScriptSpawn(
-				"checkDepsContainer.ps1",
-				"null",
-				pathSrc,
-				onStdout,
-				onSterr
-			);
+			if (os.platform() === "win32") {
+				this.createScriptSpawn(
+					"checkDepsContainer.ps1",
+					"null",
+					pathSrc,
+					onStdout,
+					onSterr
+				);
+			} else {
+				this.createScriptSpawn(
+					"checkDepsContainer.sh",
+					"null",
+					pathSrc,
+					onStdout,
+					onSterr
+				);
+			}
 		}
 	}
 }
