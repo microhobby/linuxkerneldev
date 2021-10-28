@@ -17,7 +17,9 @@ export class LinuxNativeCommands {
 	}
 
 	private createScriptSpawn(name: string, selected: string,
-		pathSrc?: string, onStdout?: Function, onSterr?: Function): void
+		pathSrc?: string, onStdout?: Function, onSterr?: Function,
+		osPlatform?: string
+	): void
 	{
 		if (selected === "") {
 			if (onSterr !== undefined) {
@@ -34,9 +36,19 @@ export class LinuxNativeCommands {
 			name
 		);
 
-		let child: any = spawn(scriptPath, [pathSrc!, selected, this.insider], {
-			shell: true
-		});
+		let child: any;
+
+		if (osPlatform !== "win32") {
+			child = spawn(scriptPath, [pathSrc!, selected, this.insider]);
+		} else {
+			child = spawn("pwsh", [
+				"-NoProfile", scriptPath, pathSrc!, selected, this.insider
+			],{
+				shell: false,
+				windowsHide: true,
+				detached: true
+			});
+		}
 
 		child.stdout.on('data', (data: string) => {
 			console.log(`stdout: ${data}`);
@@ -114,7 +126,8 @@ export class LinuxNativeCommands {
 					"null",
 					pathSrc,
 					onStdout,
-					onSterr
+					onSterr,
+					os.platform()
 				);
 			} else {
 				this.createScriptSpawn(
@@ -122,7 +135,8 @@ export class LinuxNativeCommands {
 					"null",
 					pathSrc,
 					onStdout,
-					onSterr
+					onSterr,
+					os.platform()
 				);
 			}
 		}

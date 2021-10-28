@@ -2,6 +2,10 @@
 
 All notable changes to the "linuxkerneldev" extension will be documented in this file.
 
+## [0.3.2]
+
+- Fix a issue with the dependency check for Powershell on Windows side
+
 ## [0.3.1]
 
 - Add `ctags.useDocker` configuration (only for Windows)
