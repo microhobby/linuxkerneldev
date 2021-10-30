@@ -9,6 +9,7 @@ import * as util from './util';
 // non ctags related
 import { LinuxDevCmdProvider, CmdOption } from './cmdNodeProvider'
 import { LinuxNativeCommands } from './LinuxNativeCommands';
+import { DeviceTreeVSCodeDiags } from './DeviceTreeCompileVSCodeDiags';
 
 const tagsfile = '.vscode-ctags';
 let tags: ctags.CTags;
@@ -132,6 +133,7 @@ function regenerateCTags() {
 }
 
 export function activate(context: vscode.ExtensionContext) {
+	const diagsDTC = vscode.languages.createDiagnosticCollection("dtc");
 	util.log('extension activated.');
 
 	// time to work
@@ -445,8 +447,33 @@ export function activate(context: vscode.ExtensionContext) {
 		util.log('saved', event.fileName, event.languageId);
 		const config = vscode.workspace.getConfiguration('ctags');
 		const autoRegenerate = config.get<boolean>('regenerateOnSave');
+
+		if (event.languageId === "dts") {
+			DeviceTreeVSCodeDiags.compile(event.uri, diagsDTC);
+		}
+
 		if (autoRegenerate) {
 			regenerateCTags();
+		}
+	});
+
+	vscode.workspace.onDidOpenTextDocument(event => {
+		util.log('opened', event.fileName, event.languageId);
+
+		if (event.languageId === "dts") {
+			DeviceTreeVSCodeDiags.compile(event.uri, diagsDTC);
+		}
+	});
+
+	vscode.workspace.onDidChangeTextDocument(event => {
+		util.log('changed', event.document.fileName, event.document.languageId);
+	});
+
+	vscode.window.onDidChangeActiveTextEditor(event => {
+		util.log('activaded', event?.document.fileName, event?.document.languageId);
+
+		if (event?.document.languageId === "dts") {
+			DeviceTreeVSCodeDiags.compile(event.document.uri, diagsDTC);
 		}
 	});
 }
