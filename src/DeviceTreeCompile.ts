@@ -38,8 +38,10 @@ export class DeviceTreeCompile {
         if (useDocker != null)
             this.useDocker = useDocker;
 
-        if (bindmount != null)
+        if (bindmount != null) {
             this.bindmount = bindmount;
+            this.rootpath = `${bindmount.toString()}${path.sep}`;
+        }
 
         // handle the relative paths in case of docker
         if (useDocker != null &&
@@ -52,6 +54,7 @@ export class DeviceTreeCompile {
             
             this.file = this.file.toString()
                             .replace(this.bindmount.toString(), "");
+            this.rootpath = "";
         }
     }
 
@@ -193,7 +196,21 @@ export class DeviceTreeCompile {
                 "-fdiagnostics-format=json",
                 "-nostdinc",
                 `-I ${this.includePath.toString()}`,
-                "-I arch",
+                `-I ${this.rootpath}arch`,
+                // zephyr includes
+                `-I ${this.rootpath}dts`,
+                `-I ${this.rootpath}dts/arc`,
+                `-I ${this.rootpath}dts/arm`,
+                `-I ${this.rootpath}dts/arm64`,
+                `-I ${this.rootpath}dts/bindings`,
+                `-I ${this.rootpath}dts/common`,
+                `-I ${this.rootpath}dts/nios2`,
+                `-I ${this.rootpath}dts/posix`,
+                `-I ${this.rootpath}dts/riscv`,
+                `-I ${this.rootpath}dts/sparc`,
+                `-I ${this.rootpath}dts/x86`,
+                `-I ${this.rootpath}dts/xtensa`,
+                // end zephyr includes
                 "-undef",
                 "-x assembler-with-cpp",
                 `${path.join(dotFileNamePath, `${dotFilename}`)}`,
