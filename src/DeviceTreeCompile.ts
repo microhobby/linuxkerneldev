@@ -68,6 +68,52 @@ export class DeviceTreeCompile {
         this.onErrorListeners.push(callback);
     }
 
+    private _errorInIncludeFile (
+        file: string,
+        cause: string
+    ): void {
+        let diag: DeviceTreeCompileDiagsnostics | undefined = undefined;
+        const fileName = path.basename(file);
+        const dtsContentLines = fs.readFileSync(
+            this.file,
+            "utf8"
+        ).toString().split("\n");
+
+        // only check the first 20 lines
+        for (let i = 0; i < 20; i++) {
+            if (dtsContentLines[i].includes(fileName)) {
+                diag = {
+                    file: this.file,
+                    line: i,
+                    characterStart: 0,
+                    characterEnd: dtsContentLines[i].length -1,
+                    cause: `from included file '${fileName}' : ${cause}`
+                };
+
+                this.Diagsnostics.push(diag);
+                break;
+            }
+        }
+
+        // TODO: check also the includes of the file
+        if (diag == null) {
+            for (let i = 0; i < 20; i++) {
+                if (dtsContentLines[i].includes("/dts")) {
+                    diag = {
+                        file: this.file,
+                        line: i,
+                        characterStart: 0,
+                        characterEnd: dtsContentLines[i].length -1,
+                        cause: `from included file '${fileName}' : ${cause}`
+                    };
+    
+                    this.Diagsnostics.push(diag);
+                    break;
+                }
+            }
+        }
+    }
+
     private _parseCppDiags (data: any, lineFixer: number): void {
         if (data.length > 0) {
             for (let i = 0; i < data.length; i++) {
@@ -97,21 +143,33 @@ export class DeviceTreeCompile {
                     const lineCause = dataSlices[1].split(".");
                     const line = lineCause[0];
                     const cause = dataSlices[4].trim();
+                    const file = dataSlices[0]; 
 
-                    const diag: DeviceTreeCompileDiagsnostics = {
-                        file:
-                            dataSlices[0],
-                        line:
-                            parseInt(line) - (lineFixer -1),
-                        characterStart:
-                            parseInt(lineCause[1].split("-")[0]) -1,
-                        characterEnd:
-                            parseInt(lineCause[1].split("-")[1]) -1,
-                        cause:
-                            cause
-                    };
-
-                    this.Diagsnostics.push(diag);
+                    const baseFileName = path.basename(file.trim());
+                    const thisBaseFileName = path.basename(this.file.toString());
+    
+                    if (
+                        `${thisBaseFileName.endsWith(".dtsi") 
+                            ? `.${thisBaseFileName}` : thisBaseFileName}` !==
+                        baseFileName
+                    ) {
+                        this._errorInIncludeFile(file, cause);
+                    } else {
+                        const diag: DeviceTreeCompileDiagsnostics = {
+                            file:
+                                file,
+                            line:
+                                parseInt(line) - (lineFixer -1),
+                            characterStart:
+                                parseInt(lineCause[1].split("-")[0]) -1,
+                            characterEnd:
+                                parseInt(lineCause[1].split("-")[1]) -1,
+                            cause:
+                                cause
+                        };
+    
+                        this.Diagsnostics.push(diag);
+                    }
             }
             break;
             case "FATAL ERROR: Unable to parse input tree":
@@ -121,21 +179,33 @@ export class DeviceTreeCompile {
                 const lineCause = dataSlices[2].split(" ");
                 const line = lineCause.shift();
                 const cause = lineCause.join(" ");
+                const file = dataSlices[1];
 
-                const diag: DeviceTreeCompileDiagsnostics = {
-                    file:
-                        dataSlices[1],
-                    line:
-                        parseInt(line!.split(".")[0]) -lineFixer,
-                    characterStart:
-                        parseInt(line!.split(".")[1].split("-")[0]) -1,
-                    characterEnd:
-                        parseInt(line!.split(".")[1].split("-")[1]) -1,
-                    cause:
-                        cause
-                };
+                const baseFileName = path.basename(file.trim());
+                const thisBaseFileName = path.basename(this.file.toString());
+ 
+                if (
+                    `${thisBaseFileName.endsWith(".dtsi") 
+                        ? `.${thisBaseFileName}` : thisBaseFileName}` !==
+                    baseFileName
+                ) {
+                    this._errorInIncludeFile(file, cause);
+                } else {
+                    const diag: DeviceTreeCompileDiagsnostics = {
+                        file:
+                            file,
+                        line:
+                            parseInt(line!.split(".")[0]) -lineFixer,
+                        characterStart:
+                            parseInt(line!.split(".")[1].split("-")[0]) -1,
+                        characterEnd:
+                            parseInt(line!.split(".")[1].split("-")[1]) -1,
+                        cause:
+                            cause
+                    };
 
-                this.Diagsnostics.push(diag);
+                    this.Diagsnostics.push(diag);
+                }
             }
             break;
         }
