@@ -72,6 +72,7 @@ export class CTags {
           .concat(args || [])
           //.concat([`-x`, `--_xformat='%{name}\t%{file}\t%{tagaddress}'`])
           .concat([`-R`])
+          .concat(['--exclude=\'*/\.*\''])
           .concat([`-f`, this.filename + '.next', '.'])
           .join(' ');
       } else {
@@ -83,6 +84,7 @@ export class CTags {
           .concat(args || [])
           //.concat([`-x`, `--_xformat='%{name}\t%{file}\t%{tagaddress}'`])
           .concat([`-R`])
+          .concat(['--exclude=\'*/\.*\''])
           .concat([`-f`, this.filename + '.next', '.'])
           .join(' ');
       }
