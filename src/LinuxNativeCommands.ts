@@ -113,7 +113,7 @@ export class LinuxNativeCommands {
 		onSterr?: Function): void
 	{
 		// resolve and run
-		const config = vscode.workspace.getConfiguration('ctags');
+		const config = vscode.workspace.getConfiguration('kerneldev');
 		const useDocker = config.get<boolean>('useDocker');
 
 		if (!useDocker) {

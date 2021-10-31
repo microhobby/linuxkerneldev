@@ -12,9 +12,16 @@ export class DeviceTreeVSCodeDiags {
         diagColletion: vscode.DiagnosticCollection
     ): void {
         const diags: vscode.Diagnostic[] = [];
+        const config = vscode.workspace.getConfiguration('kerneldev');
+		const useDocker = config.get<boolean>('useDocker');
+
         // TODO: here we are harding coding the include path
-        let dtc = new DeviceTreeCompile(fileDocument.fsPath,
-                        path.join(vscode.workspace.rootPath!, "include"));
+        let dtc = new DeviceTreeCompile(
+            fileDocument.fsPath,
+            path.join(vscode.workspace.rootPath!, "include"),
+            useDocker,
+            vscode.workspace.rootPath!
+        );
         
         // cleanup
         diagColletion.set(fileDocument, diags);
