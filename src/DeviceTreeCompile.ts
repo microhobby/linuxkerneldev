@@ -87,25 +87,57 @@ export class DeviceTreeCompile {
     }
 
     private _parseDtcDiags (lines: string[], lineFixer: number): void {
-        for (let i = 0; i < lines.length; i++) {
-            const dataSlices: string[] = lines[i].split(":");
-            // console.log(lines[i]);
+        // check if this is a error
+        const lastIndex = lines[lines.length -2];
 
-            if (dataSlices[0].startsWith("Error")) {
+        switch (lastIndex) {
+            case "ERROR: Input tree has errors, aborting (use -f to force output)":
+            {
+                    const dataSlices: string[] = lines[0].split(":");
+                    const lineCause = dataSlices[1].split(".");
+                    const line = lineCause[0];
+                    const cause = dataSlices[4].trim();
+
+                    const diag: DeviceTreeCompileDiagsnostics = {
+                        file:
+                            dataSlices[0],
+                        line:
+                            parseInt(line) - (lineFixer -1),
+                        characterStart:
+                            parseInt(lineCause[1].split("-")[0]) -1,
+                        characterEnd:
+                            parseInt(lineCause[1].split("-")[1]) -1,
+                        cause:
+                            cause
+                    };
+
+                    this.Diagsnostics.push(diag);
+            }
+            break;
+            case "FATAL ERROR: Unable to parse input tree":
+            case "FATAL ERROR: Syntax error parsing input tree":
+            {
+                const dataSlices: string[] = lines[0].split(":");
                 const lineCause = dataSlices[2].split(" ");
                 const line = lineCause.shift();
                 const cause = lineCause.join(" ");
 
                 const diag: DeviceTreeCompileDiagsnostics = {
-                    file: dataSlices[1],
-                    line: parseInt(line!.split(".")[0]) -lineFixer,
-                    characterStart: parseInt(line!.split(".")[1].split("-")[0]) -1,
-                    characterEnd: parseInt(line!.split(".")[1].split("-")[1]) -1,
-                    cause: cause
+                    file:
+                        dataSlices[1],
+                    line:
+                        parseInt(line!.split(".")[0]) -lineFixer,
+                    characterStart:
+                        parseInt(line!.split(".")[1].split("-")[0]) -1,
+                    characterEnd:
+                        parseInt(line!.split(".")[1].split("-")[1]) -1,
+                    cause:
+                        cause
                 };
 
                 this.Diagsnostics.push(diag);
             }
+            break;
         }
     }
 
