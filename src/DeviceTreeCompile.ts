@@ -76,8 +76,8 @@ export class DeviceTreeCompile {
                 const diag: DeviceTreeCompileDiagsnostics = {
                     file: obj.locations[0].caret.file,
                     line: obj.locations[0].caret.line -lineFixer,
-                    characterStart: obj.locations[0].caret.column,
-                    characterEnd: obj.locations[0].finish.column,
+                    characterStart: obj.locations[0].caret.column -1,
+                    characterEnd: obj.locations[0].finish.column -1,
                     cause: obj.message
                 };
 
@@ -99,8 +99,8 @@ export class DeviceTreeCompile {
                 const diag: DeviceTreeCompileDiagsnostics = {
                     file: dataSlices[1],
                     line: parseInt(line!.split(".")[0]) -lineFixer,
-                    characterStart: parseInt(line!.split(".")[1].split("-")[0]),
-                    characterEnd: parseInt(line!.split(".")[1].split("-")[1]),
+                    characterStart: parseInt(line!.split(".")[1].split("-")[0]) -1,
+                    characterEnd: parseInt(line!.split(".")[1].split("-")[1]) -1,
                     cause: cause
                 };
 
@@ -174,7 +174,11 @@ export class DeviceTreeCompile {
         // we need to add the /dts-v1/
         if (dotFilename.endsWith("dtsi")) {
             const dtsiContent = fs.readFileSync(
-                path.join(dotFileNamePath, `${dotFilename}`),
+                path.join(
+                    this.useDocker ? this.bindmount.toString() : "",
+                    dotFileNamePath,
+                    `${dotFilename}`
+                ),
                 "utf8"
             ).toString();
 
@@ -182,7 +186,11 @@ export class DeviceTreeCompile {
             dtsiInjected = dtsiInjected.concat(dtsiContent); 
 
             fs.writeFileSync(
-                path.join(dotFileNamePath, `.${dotFilename}`),
+                path.join(
+                    this.useDocker ? this.bindmount.toString() : "",
+                    dotFileNamePath,
+                    `.${dotFilename}`
+                ),
                 dtsiInjected
             );
 
