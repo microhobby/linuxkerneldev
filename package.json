@@ -113,10 +113,15 @@
 						"type": "boolean",
 						"markdownDescription": "If true, then ctags will be disabled",
 						"default": false
-					},
-					"ctags.useDocker": {
+					}
+				}
+			},
+			{
+				"title": "Linux Kernel Dev",
+				"properties": {
+					"kerneldev.useDocker": {
 						"type": "boolean",
-						"markdownDescription": "If true, then ctags will generated from the seadoglinux/ctags docker image (Windows Only!)",
+						"markdownDescription": "If true, then ctags/dtc/cpp will generated from the seadoglinux/utils docker image (Windows Only!)",
 						"default": false
 					}
 				}

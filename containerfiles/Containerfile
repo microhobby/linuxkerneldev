@@ -1,11 +1,13 @@
 FROM debian
 
-RUN apt-get -y update && apt-get install -y \
-    universal-ctags && \
+RUN apt-get -y update && apt-get install -y --no-install-recommends \
+    universal-ctags \
+    device-tree-compiler \
+    cpp && \
     apt-get clean && \
     apt-get autoremove && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /bindmount
 
-ENTRYPOINT [ "ctags" ]
+CMD [ "echo", "LINUX KERNEL DEV UTILS" ]

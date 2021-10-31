@@ -63,7 +63,7 @@ export class CTags {
 
   private regenerateFile(args?: string[]): Promise<void> {
     return new Promise((resolve, reject) => {
-      const config = vscode.workspace.getConfiguration('ctags');
+      const config = vscode.workspace.getConfiguration('kerneldev');
 		  const useDocker = config.get<boolean>('useDocker');
       let command: string = "";
 
@@ -78,7 +78,8 @@ export class CTags {
         command = ['docker']
           .concat('run', '--rm')
           .concat('-v', `${vscode.workspace.rootPath!}:/bindmount`)
-          .concat('seadoglinux/ctags')
+          .concat('seadoglinux/utils')
+          .concat('ctags')
           .concat(args || [])
           //.concat([`-x`, `--_xformat='%{name}\t%{file}\t%{tagaddress}'`])
           .concat([`-R`])

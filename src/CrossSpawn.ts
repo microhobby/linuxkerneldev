@@ -11,19 +11,24 @@ import * as os from 'os';
 export class CrossSpawn {
     public static spawn (
         cmd: string,
-        args?: string[]
+        args?: string[],
+        useDocker?: boolean,
+        bindmount?: PathLike
     ): ChildProcessWithoutNullStreams {
-        if (os.platform() === "win32") {
+        if (os.platform() === "win32" || useDocker) {
             // use docker
             let dockerArgs = [
                 "run",
                 "--rm",
+                "-t",
+                "-v",
+                `${bindmount}:/bindmount`,
                 "seadoglinux/utils",
                 cmd
             ];
 
             if (args)
-                dockerArgs.concat(args);
+                dockerArgs = dockerArgs.concat(args);
             
             return spawn(
                 "docker",

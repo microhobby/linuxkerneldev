@@ -20,14 +20,39 @@ export interface DeviceTreeCompileDiagsnostics {
 export class DeviceTreeCompile {
     private file: PathLike;
     private includePath: PathLike;
+    private useDocker: boolean = false;
+    private bindmount: PathLike = "";
+    private rootpath: PathLike = "";
     private onErrorListeners:
         Array<(diagnostics: Array<DeviceTreeCompileDiagsnostics>) => void> = [];
     public Diagsnostics: Array<DeviceTreeCompileDiagsnostics> = [];
 
-    constructor(file: PathLike, includePath: PathLike)
+    constructor(
+        file: PathLike,
+        includePath: PathLike,
+        useDocker?: boolean, bindmount?: PathLike)
 	{
         this.file = file;
         this.includePath = includePath;
+
+        if (useDocker != null)
+            this.useDocker = useDocker;
+
+        if (bindmount != null)
+            this.bindmount = bindmount;
+
+        // handle the relative paths in case of docker
+        if (useDocker != null &&
+            useDocker === true &&
+            bindmount != null
+        ) {
+            this.bindmount = `${bindmount.toString()}${path.sep}`;
+            this.includePath = this.includePath.toString()
+                                    .replace(this.bindmount.toString(), "");
+            
+            this.file = this.file.toString()
+                            .replace(this.bindmount.toString(), "");
+        }
     }
 
     public compile (): void {
@@ -81,6 +106,25 @@ export class DeviceTreeCompile {
         }
     }
 
+    private _switchStdErrStdOut (data: string, lineFixer: number): void {
+        const dataString: string = data.toString();
+
+        try {
+            const jsonData = JSON.parse(dataString
+                .replace("compilation terminated.", "").trim());
+            // is valid json, so let get the data
+            this._parseCppDiags(jsonData, lineFixer);
+        } catch (error) {
+            // is not a  valid json, check if is the dtc output
+            const lines = dataString.split("\n");
+            this._parseDtcDiags(lines, lineFixer);
+        }
+
+        for (let i = 0; i < this.onErrorListeners.length; i++) {
+            this.onErrorListeners[i](this.Diagsnostics);
+        }
+    }
+
     private _attach (
         child: ChildProcessWithoutNullStreams,
         lineFixer: number,
@@ -106,27 +150,14 @@ export class DeviceTreeCompile {
             }
         });
 
+        // docker
         child.stdout.on('data', (data: string) => {
-			console.log(`stdout: ${data}`);
+			this._switchStdErrStdOut(data, lineFixer);
 		});
 
+        // native
 		child.stderr.on('data', (data: any) => {
-            const dataString: string = data.toString();
-
-            try {
-                const jsonData = JSON.parse(dataString
-                    .replace("compilation terminated.", "").trim());
-                // is valid json, so let get the data
-                this._parseCppDiags(jsonData, lineFixer);
-            } catch (error) {
-                // is not a  valid json, check if is the dtc output
-                const lines = dataString.split("\n");
-                this._parseDtcDiags(lines, lineFixer);
-            }
-
-            for (let i = 0; i < this.onErrorListeners.length; i++) {
-                this.onErrorListeners[i](this.Diagsnostics);
-            }
+            this._switchStdErrStdOut(data, lineFixer);
 		});
     }
 
@@ -167,7 +198,9 @@ export class DeviceTreeCompile {
                 "-x assembler-with-cpp",
                 `${path.join(dotFileNamePath, `${dotFilename}`)}`,
                 `${path.join(dotFileNamePath, `.${dotFilename}.pre`)}`
-            ]
+            ],
+            this.useDocker,
+            this.bindmount
         );
 
         this._attach(child, lineFixer, this._compile);
@@ -193,7 +226,9 @@ export class DeviceTreeCompile {
                 `${path.join(dotFileNamePath, `.${dotFilename}.pre`)}`,
                 `-o ${path.join(dotFileNamePath, `.${dotFilename}.pre.yaml`)}`,
                 `-O yaml`
-            ]
+            ],
+            this.useDocker,
+            this.bindmount
         );
 
         this._attach(dtcChild, lineFixer);

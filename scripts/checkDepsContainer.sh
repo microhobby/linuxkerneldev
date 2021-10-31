@@ -1,3 +1,3 @@
 #!/bin/bash
 
-docker run --rm -v ${pwd}:${pwd} seadoglinux/ctags --help
+docker run --rm -t -v ${pwd}:${pwd} seadoglinux/utils
