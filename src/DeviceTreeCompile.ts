@@ -159,7 +159,7 @@ export class DeviceTreeCompile {
                             file:
                                 file,
                             line:
-                                parseInt(line) - (lineFixer -1),
+                                parseInt(line) - (lineFixer),
                             characterStart:
                                 parseInt(lineCause[1].split("-")[0]) -1,
                             characterEnd:

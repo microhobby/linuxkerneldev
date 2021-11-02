@@ -107,11 +107,13 @@ export class CmdOption extends vscode.TreeItem {
 	) {
 		super(label, collapsibleState);
 	}
-
+	
+	// @ts-ignore
 	get tooltip(): string {
 		return `${this.label}`;
 	}
 
+	// @ts-ignore
 	get description(): string {
 		return `${this.desc}`;
 	}
