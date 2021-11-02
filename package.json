@@ -123,6 +123,24 @@
 						"type": "boolean",
 						"markdownDescription": "If true, then ctags/dtc/cpp will generated from the seadoglinux/utils docker image (Windows Only!)",
 						"default": false
+					},
+					"kerneldev.experimental.newDtsEngine": {
+						"type": "boolean",
+						"markdownDescription": "Use the experimental Device Tree Source completion and lookup engine. (⚠️ Experimental features have not been fully tested and may have unexpected behavior)",
+						"default": false
+					}
+				}
+			},
+			{
+				"title": "DeviceTree",
+				"properties": {
+					"devicetree.bindings": {
+						"type": "array",
+						"description": "List of directories containing binding descriptors. Relative paths are executed from each workspace.",
+						"default": [
+							"${workspaceFolder}/dts/bindings",
+							"${workspaceFolder}/Documentation/devicetree/bindings"
+						]
 					}
 				}
 			}
@@ -200,20 +218,20 @@
 				"configuration": "syntaxes/kconfig-language.json"
 			},
 			{
-                "id": "dts",
-                "aliases": [
-                    "DeviceTree"
-                ],
-                "configuration": "syntaxes/devicetree-language.json",
-                "extensions": [
-                    ".dts",
-                    ".dtsi",
-                    ".dts_compiled",
-                    ".overlay",
-                    ".dts.pre.tmp"
-                ],
-                "firstLine": "/dts-v1/;"
-            }
+				"id": "dts",
+				"aliases": [
+					"DeviceTree"
+				],
+				"configuration": "syntaxes/devicetree-language.json",
+				"extensions": [
+					".dts",
+					".dtsi",
+					".dts_compiled",
+					".overlay",
+					".dts.pre.tmp"
+				],
+				"firstLine": "/dts-v1/;"
+			}
 		],
 		"grammars": [
 			{
@@ -222,10 +240,10 @@
 				"path": "./syntaxes/kconfig.tmGrammar.json"
 			},
 			{
-                "language": "dts",
-                "scopeName": "source.dts",
-                "path": "./syntaxes/dts.tmLanguage.json"
-            }
+				"language": "dts",
+				"scopeName": "source.dts",
+				"path": "./syntaxes/dts.tmLanguage.json"
+			}
 		]
 	},
 	"scripts": {
@@ -237,6 +255,7 @@
 	},
 	"devDependencies": {
 		"@types/glob": "^7.1.1",
+		"@types/js-yaml": "3.11.1",
 		"@types/mocha": "^5.2.7",
 		"@types/node": "^12.11.7",
 		"@types/vscode": "^1.41.0",
@@ -247,6 +266,7 @@
 		"vscode-test": "^1.2.2"
 	},
 	"dependencies": {
+		"js-yaml": "^3.13.1",
 		"textindexer": "0.0.7"
 	},
 	"icon": "res/icon.png",

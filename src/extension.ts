@@ -10,9 +10,37 @@ import * as util from './util';
 import { LinuxDevCmdProvider, CmdOption } from './cmdNodeProvider'
 import { LinuxNativeCommands } from './LinuxNativeCommands';
 import { DeviceTreeVSCodeDiags } from './DeviceTreeCompileVSCodeDiags';
+import { DTSEngine } from './DTSEngine';
 
 const tagsfile = '.vscode-ctags';
 let tags: ctags.CTags;
+
+// TODO: gambiarra das boas ptbr huehue kkkkk
+function forceValidation (filename: string): void {
+    const editor = vscode.window.activeTextEditor;
+
+	if (editor.document.fileName === filename) {
+		void editor?.edit(builder => {
+		var lastLine = editor.document
+			.lineAt(editor.document.lineCount - 1);
+
+		builder.insert(new vscode.Position(lastLine.lineNumber + 1, 0), "\n");
+		}).then(val => {
+		void editor.document.save().then(val => {
+			void editor?.edit(builder => {
+			const lastLine = editor.document
+				.lineAt(editor.document.lineCount - 1);
+			const penultLine = editor.document
+				.lineAt(editor.document.lineCount - 2);
+
+			builder.delete(new vscode.Selection(lastLine.range.start, penultLine.range.end));
+			}).then(val => {
+			void editor.document.save();
+			});
+		});
+		});
+	}
+}
 
 class CTagsDefinitionProvider implements vscode.DefinitionProvider {
 	public provideDefinition(
@@ -134,6 +162,7 @@ function regenerateCTags() {
 
 export function activate(context: vscode.ExtensionContext) {
 	const diagsDTC = vscode.languages.createDiagnosticCollection("dtc");
+	const engine = new DTSEngine();
 	util.log('extension activated.');
 
 	// time to work
@@ -459,10 +488,6 @@ export function activate(context: vscode.ExtensionContext) {
 
 	vscode.workspace.onDidOpenTextDocument(event => {
 		util.log('opened', event.fileName, event.languageId);
-
-		if (event.languageId === "dts") {
-			DeviceTreeVSCodeDiags.compile(event.uri, diagsDTC);
-		}
 	});
 
 	vscode.workspace.onDidChangeTextDocument(event => {
@@ -473,9 +498,22 @@ export function activate(context: vscode.ExtensionContext) {
 		util.log('activaded', event?.document.fileName, event?.document.languageId);
 
 		if (event?.document.languageId === "dts") {
+			forceValidation(event?.document.fileName,);
 			DeviceTreeVSCodeDiags.compile(event.document.uri, diagsDTC);
 		}
 	});
+
+	// xperimental https://miro.medium.com/max/910/1*snTXFElFuQLSFDnvZKJ6IA.png
+	vscode.workspace.onDidChangeConfiguration(val => {
+		if (val.affectsConfiguration('kerneldev.experimental')) {
+			vscode.commands.executeCommand("workbench.action.reloadWindow");
+		}
+	});
+
+	const kerneldevConfig = vscode.workspace.getConfiguration('kerneldev');
+	if (kerneldevConfig.experimental.newDtsEngine === true) {
+		engine.activate(context);
+	}
 }
 
 export function deactivate() { }
