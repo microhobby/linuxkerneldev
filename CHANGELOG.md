@@ -2,6 +2,10 @@
 
 All notable changes to the "linuxkerneldev" extension will be documented in this file.
 
+## [0.4.0]
+
+- 🧪 Experimental DTS Engine
+
 ## [0.3.2]
 
 - Fix a issue with the dependency check for Powershell on Windows side

@@ -28,6 +28,38 @@ activity bar:
 
 In the next topics, I will describe each of the extension features.
 
+### 🧪 Experimental Device Tree Source Engine
+
+> A new DTS Engine parser is in testing phase. This does not use ctags and it has a totally different behavior showing hints and lookups just for the included files.
+
+To use new DTS Engine add the following to your `settings.json`:
+
+```json
+    "kerneldev.experimental.newDtsEngine": true
+```
+
+Changing this configuration and saving will automatically reload the extension to make effect.
+
+Also make sure to remove the `DTS` from the `ctags.languages`. The default configuration is:
+
+```json
+    "ctags.languages": [
+        "C",
+        "C++",
+        "DTS",
+        "Kconfig",
+        "Make"
+    ],
+```
+
+The new DTS Engine uses the `yaml` binding documentation to have completion tips and validation. The extension needs to know a valid path to documentation. If you are opening the root folder from Linux Kernel source code add the following to your `settings.json`:
+
+```json
+    "devicetree.bindings": [
+        "${workspaceFolder}/Documentation/devicetree/bindings"
+    ],
+```
+
 ### Device Tree Doc From Compatible
 
 In a device-tree file, ".dts" or ".dtsi", or in a device driver file ".c", mouse
