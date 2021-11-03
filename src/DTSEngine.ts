@@ -8,6 +8,9 @@ import { capitalize } from './dtsUtil';
 import { LinuxNativeCommands } from './LinuxNativeCommands';
 import { CompatibleMatchCache, DocMatchCache } from './CompatibleMatchCache';
 
+const _statusbarIndexing = vscode.window
+    .createStatusBarItem(vscode.StatusBarAlignment.Left);
+
 export const config = vscode.workspace.getConfiguration('devicetree');
 
 function getConfig(variable: string) {
@@ -1604,6 +1607,9 @@ export class DTSEngine implements
      * TODO
      */
     async provideDocumentLinks(document: vscode.TextDocument, token: vscode.CancellationToken): Promise<vscode.DocumentLink[]> {
+        _statusbarIndexing.text = `$(loading~spin) Indexing .dts file`;
+        _statusbarIndexing.show();
+        
         const nativeCmdHelper = new LinuxNativeCommands();
         await this.parser.stable();
         const includes = this.parser.file(document.uri)?.includes.filter(i => i.loc.uri.fsPath === document.uri.fsPath).map(i => {
@@ -1662,7 +1668,7 @@ export class DTSEngine implements
                                 });
                             }
                         } catch (error) {
-                            console.log(`Error creating DocumentLink DTS .C :: ${error.toString()}`);
+                            console.log(`Error creating DocumentLink DTS .C`);
                         }
                     } else {
                         const link = new vscode.DocumentLink(
@@ -1714,7 +1720,7 @@ export class DTSEngine implements
                                 }
                             }
                         } catch (error) {
-                            console.log(`Error creating DocumentLink DTS DOC :: ${error.toString()}`);
+                            console.log(`Error creating DocumentLink DTS DOC`);
                         }
                     } else {
                         for (let k = 0; k < docMatch.files.length; k++) {
@@ -1733,6 +1739,7 @@ export class DTSEngine implements
             }
         }
 
+        _statusbarIndexing.hide();
         return new Array<vscode.DocumentLink>().concat(includes, compatibleLinks);
     }
 }
