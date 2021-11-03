@@ -396,9 +396,6 @@ export function activate(context: vscode.ExtensionContext) {
 	// here begins the real code
 	vscode.commands.registerCommand(
 		'embeddedLinuxDev.findAndOpenDeviceTreeDoc', () => {
-
-			console.log("bosta");
-
 			// call the grep script
 			nativeCmdsExecuter.findAndOpenDeviceTreeDoc(
 				getSelectedString(),
