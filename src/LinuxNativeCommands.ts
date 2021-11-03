@@ -16,6 +16,38 @@ export class LinuxNativeCommands {
 		}
 	}
 
+	private async asyncCreateScriptSpawn (
+		name: string,
+		selected: string,
+		pathSrc?: string
+	): Promise<string> {
+		return new Promise<string>((res, rej) => {
+			let scriptPath: string = path.join(__filename,
+				"..",
+				"..",
+				"scripts",
+				name
+			);
+	
+			let child: any;
+			child = spawn(scriptPath, [pathSrc!, selected, this.insider]);
+	
+			child.stdout.on('data', (data: string) => {
+				console.log(`stdout: ${data}`);
+				res(data.toString());
+			});
+
+			child.stderr.on('data', (data: string) => {
+				console.error(`stderr: ${data}`);
+				rej();
+			});
+			
+			child.on('close', (code: any) => {
+				rej();
+			});
+		});
+	}
+
 	private createScriptSpawn(name: string, selected: string,
 		pathSrc?: string, onStdout?: Function, onSterr?: Function,
 		osPlatform?: string
@@ -83,6 +115,27 @@ export class LinuxNativeCommands {
 		// resolve and run
 		this.createScriptSpawn("findDeviceTreeMatch.sh", selected,
 			pathSrc, onStdout, onSterr);
+	}
+
+	async asyncFindDeviceTreeMathc (
+		selected: string, pathSrc?: string
+	): Promise<string> {
+		return this.asyncCreateScriptSpawn(
+			"findDeviceTreeMatchReturnString.sh",
+			selected,
+			pathSrc
+		);
+	}
+
+	async asyncFindDeviceTreeDoc(
+		selected: string,
+		pathSrc?: string
+	): Promise<string> {
+		return this.asyncCreateScriptSpawn(
+			"findDeviceTreeMatchDocReturnString.sh",
+			selected,
+			pathSrc
+		);
 	}
 
 	findArmDts(selected: string, pathSrc?: string,
