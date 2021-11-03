@@ -43,7 +43,8 @@ export class LinuxNativeCommands {
 			});
 			
 			child.on('close', (code: any) => {
-				rej();
+				if (code !== 0)
+					rej();
 			});
 		});
 	}
