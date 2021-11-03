@@ -307,6 +307,7 @@ export class DeviceTreeCompile {
                 "-nostdinc",
                 `-I ${this.includePath.toString()}`,
                 `-I ${this.rootpath}arch`,
+                `-I ${this.rootpath}scripts/dtc/include-prefixes`,
                 // zephyr includes
                 `-I ${this.rootpath}dts`,
                 `-I ${this.rootpath}dts/arc`,
