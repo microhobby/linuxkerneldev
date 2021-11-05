@@ -1361,11 +1361,13 @@ export class Parser {
         Object.entries(defines).forEach(([name, value]) => this.defines[name] = new Define(name, value));
 
         // TODO: include paths
-        this.includes.push(path.join(vscode.workspace.rootPath!, "include"));
-        this.includes.push(path.join(vscode.workspace.rootPath!,
-            "scripts",
-            "dtc",
-            "include-prefixes"));
+        if (vscode.workspace.rootPath != null) {
+            this.includes.push(path.join(vscode.workspace.rootPath, "include"));
+            this.includes.push(path.join(vscode.workspace.rootPath,
+                "scripts",
+                "dtc",
+                "include-prefixes"));
+        }
     }
 
     file(uri: vscode.Uri) {
