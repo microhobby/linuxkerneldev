@@ -162,7 +162,6 @@ function regenerateCTags() {
 
 export function activate(context: vscode.ExtensionContext) {
 	const diagsDTC = vscode.languages.createDiagnosticCollection("dtc");
-	const engine = new DTSEngine();
 	util.log('extension activated.');
 
 	// time to work
@@ -509,6 +508,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	const kerneldevConfig = vscode.workspace.getConfiguration('kerneldev');
 	if (kerneldevConfig.experimental.newDtsEngine === true) {
+		const engine = new DTSEngine();
 		engine.activate(context);
 	}
 }
