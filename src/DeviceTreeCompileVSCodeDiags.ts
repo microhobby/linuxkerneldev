@@ -12,43 +12,46 @@ export class DeviceTreeVSCodeDiags {
         diagColletion: vscode.DiagnosticCollection
     ): void {
         const diags: vscode.Diagnostic[] = [];
-        const config = vscode.workspace.getConfiguration('kerneldev');
-		const useDocker = config.get<boolean>('useDocker');
+        const configKerneldev = vscode.workspace.getConfiguration('kerneldev');
+		const useDocker = configKerneldev.get<boolean>('useDocker');
+        const experimental = configKerneldev.get<any>('experimental');
 
-        // TODO: here we are harding coding the include path
-        let dtc = new DeviceTreeCompile(
-            fileDocument.fsPath,
-            path.join(vscode.workspace.rootPath!, "include"),
-            useDocker,
-            vscode.workspace.rootPath!
-        );
-        
-        // cleanup
-        diagColletion.set(fileDocument, diags);
+        if (experimental.newDtsEngine) {
+            // TODO: here we are harding coding the include path
+            let dtc = new DeviceTreeCompile(
+                fileDocument.fsPath,
+                path.join(vscode.workspace.rootPath!, "include"),
+                useDocker,
+                vscode.workspace.rootPath!
+            );
+            
+            // cleanup
+            diagColletion.set(fileDocument, diags);
 
-        dtc.onError(errors => {
-            errors.forEach(error => {
-                diags.push(
-                    new vscode.Diagnostic(
-                        new vscode.Range(
-                            new vscode.Position(
-                                error.line,
-                                error.characterStart
+            dtc.onError(errors => {
+                errors.forEach(error => {
+                    diags.push(
+                        new vscode.Diagnostic(
+                            new vscode.Range(
+                                new vscode.Position(
+                                    error.line,
+                                    error.characterStart
+                                ),
+                                new vscode.Position(
+                                    error.line,
+                                    error.characterEnd
+                                )
                             ),
-                            new vscode.Position(
-                                error.line,
-                                error.characterEnd
-                            )
-                        ),
-                        error.cause,
-                        vscode.DiagnosticSeverity.Error
-                    )
-                );
+                            error.cause,
+                            vscode.DiagnosticSeverity.Error
+                        )
+                    );
+                });
+
+                diagColletion.set(fileDocument, diags);
             });
 
-            diagColletion.set(fileDocument, diags);
-        });
-
-        dtc.compile();
+            dtc.compile();
+        }
     }
 };
