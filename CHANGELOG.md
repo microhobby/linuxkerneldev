@@ -2,6 +2,10 @@
 
 All notable changes to the "linuxkerneldev" extension will be documented in this file.
 
+## [0.4.1]
+
+- Add the dts compile validation and `device-tree-compiler` dependency as experimental
+
 ## [0.4.0]
 
 - 🧪 Experimental DTS Engine

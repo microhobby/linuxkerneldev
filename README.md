@@ -13,24 +13,18 @@ dependencies on your system:
 
 An important detail is to install universal-ctags and not exuberant-ctags to have support to index Kconfig and device tree files.
 
-For a complete development experience for the Linux kernel development, during
-the installation of the extension, the following extensions will be required to
-be installed together:
-
-- [DeviceTree](https://marketplace.visualstudio.com/items?itemName=plorefice.devicetree) (syntax highlighting for device-tree .dts e .dtsi files)
-
-## Features
-
-All features of the extension can be accessed by clicking commands through the
-activity bar:
-
-![](https://raw.githubusercontent.com/microhobby/linuxkerneldev/master/docs/extensionview.gif)
-
-In the next topics, I will describe each of the extension features.
-
-### 🧪 Experimental Device Tree Source Engine
+## 🧪 Experimental Device Tree Source Engine
 
 > A new DTS Engine parser is in testing phase. This does not use ctags and it has a totally different behavior showing hints and lookups just for the included files.
+
+### Requirements
+
+The new DTS engine validate and compile the device tree source using the device tree compiler `dtc`. Before use you must install the following 
+dependencies on your system:
+
+- device-tree-compiler
+
+### Enabling Experimental DTS Engine
 
 To use new DTS Engine add the following to your `settings.json`:
 
@@ -59,6 +53,15 @@ The new DTS Engine uses the `yaml` binding documentation to have completion tips
         "${workspaceFolder}/Documentation/devicetree/bindings"
     ],
 ```
+
+## Features
+
+All features of the extension can be accessed by clicking commands through the
+activity bar:
+
+![](https://raw.githubusercontent.com/microhobby/linuxkerneldev/master/docs/extensionview.gif)
+
+In the next topics, I will describe each of the extension features.
 
 ### Device Tree Doc From Compatible
 
