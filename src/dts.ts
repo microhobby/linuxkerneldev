@@ -8,6 +8,7 @@ import * as path from 'path';
 import { Define, preprocess, Defines, ProcessedFile } from './preprocessor';
 import { NodeType, TypeLoader } from './dtsTypes';
 import { ParserState } from './dtsParser';
+import { isTyping } from './util';
 
 abstract class PropertyValue {
     val: any;
@@ -1533,10 +1534,13 @@ export class Parser {
         this.changeEmitter.fire(ctx);
     }
 
-    private async onDidChange(e: vscode.TextDocumentChangeEvent) {
-        if (!e.contentChanges.length) {
+    private onDidChange = async (e: vscode.TextDocumentChangeEvent) => {
+        if (!e.contentChanges.length || isTyping(this.onDidChange)) {
+            console.log("user is still typing wait");
             return;
         }
+
+        console.log("ok, user stoped to type, now we can parse");
 
         // Postpone reparsing of other contexts until they're refocused:
         [...this.appCtx, ...this.boardCtx].filter(ctx => ctx.has(e.document.uri)).forEach(ctx => ctx.dirty.push(e.document.uri)); // TODO: Filter duplicates?
