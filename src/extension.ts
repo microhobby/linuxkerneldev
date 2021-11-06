@@ -161,6 +161,7 @@ function regenerateCTags() {
 }
 
 export function activate(context: vscode.ExtensionContext) {
+	const kerneldevConfig = vscode.workspace.getConfiguration('kerneldev');
 	const diagsDTC = vscode.languages.createDiagnosticCollection("dtc");
 	util.log('extension activated.');
 
@@ -315,14 +316,18 @@ export function activate(context: vscode.ExtensionContext) {
 		{ scheme: 'file', language: 'c' },
 		definitionsProvider
 	);
-	vscode.languages.registerDefinitionProvider(
-		{ scheme: 'file', language: 'dts' },
-		definitionsProvider
-	);
-	vscode.languages.registerDefinitionProvider(
-		{ scheme: 'file', language: 'dtsi' },
-		definitionsProvider
-	);
+
+	if (kerneldevConfig.experimental.newDtsEngine !== true) {
+		vscode.languages.registerDefinitionProvider(
+			{ scheme: 'file', language: 'dts' },
+			definitionsProvider
+		);
+		vscode.languages.registerDefinitionProvider(
+			{ scheme: 'file', language: 'dtsi' },
+			definitionsProvider
+		);
+	}
+
 	vscode.languages.registerDefinitionProvider(
 		{ scheme: 'file', language: 'kconfig' },
 		definitionsProvider
@@ -494,7 +499,6 @@ export function activate(context: vscode.ExtensionContext) {
 		util.log('activaded', event?.document.fileName, event?.document.languageId);
 
 		if (event?.document.languageId === "dts") {
-			forceValidation(event?.document.fileName,);
 			DeviceTreeVSCodeDiags.compile(event.document.uri, diagsDTC);
 		}
 	});
@@ -506,7 +510,6 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 	});
 
-	const kerneldevConfig = vscode.workspace.getConfiguration('kerneldev');
 	if (kerneldevConfig.experimental.newDtsEngine === true) {
 		const engine = new DTSEngine();
 		engine.activate(context);
