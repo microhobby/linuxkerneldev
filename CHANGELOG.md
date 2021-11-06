@@ -2,6 +2,10 @@
 
 All notable changes to the "linuxkerneldev" extension will be documented in this file.
 
+## [0.4.6]
+
+- 🧪 Experimental DTSEngine performance fixes
+
 ## [0.4.5]
 
 - Fix kconfig coloring for defconfig_ files
