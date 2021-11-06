@@ -1607,6 +1607,7 @@ export class DTSEngine implements
      * TODO
      */
     async provideDocumentLinks(document: vscode.TextDocument, token: vscode.CancellationToken): Promise<vscode.DocumentLink[]> {
+        await this.parser.stable();
         _statusbarIndexing.text = `$(loading~spin) Indexing .dts file`;
         _statusbarIndexing.show();
         
@@ -1627,13 +1628,18 @@ export class DTSEngine implements
             }
         });
 
-        const compatibleLinks = new Array<vscode.DocumentLink>();
+        const compatibleLinksImp = new Array<vscode.DocumentLink>();
+        const compatibleLinksDoc = new Array<vscode.DocumentLink>();
 
         for (let i=0; i < compatibles.length; i++) {
             if (compatibles[i] && compatibles[i].length > 0
                 && compatibles[i][0].loc.uri === document.uri) {
                 const compatibleValues = compatibles[i];
                 for (let j = 0; j < compatibleValues.length; j++) {
+                    if (compatibleValues[j].val == "toradex,evalspi") {
+                        console.log("MAOE");
+                    }
+
                     const match = CompatibleMatchCache
                         .Cache.find(i => i.compatible === compatibleValues[j].val);
 
@@ -1658,27 +1664,35 @@ export class DTSEngine implements
 
                                 link.tooltip = `${grepSlices[0]}`;
 
-                                if (!compatibleLinks.find(l => l.target.fsPath == link.target.fsPath)) {
-                                    compatibleLinks.push(link);
+                                if (!compatibleLinksImp.find(l => l.target.fsPath == link.target.fsPath)) {
+                                    compatibleLinksImp.push(link);
                                 }
 
                                 CompatibleMatchCache.Cache.push({
                                     compatible: compatibleValues[j].val,
-                                    file: dst
+                                    file: dst,
+                                    notFound: false
                                 });
+                            } else {
+                                throw new Error("goto");
                             }
                         } catch (error) {
                             console.log(`Error creating DocumentLink DTS .C`);
+                            CompatibleMatchCache.Cache.push({
+                                compatible: compatibleValues[j].val,
+                                file: undefined,
+                                notFound: true
+                            });
                         }
-                    } else {
+                    } else if (!match.notFound) {
                         const link = new vscode.DocumentLink(
                             compatibleValues[j].loc.range,
                             match.file
                         );
                         link.tooltip = `${match.file.fsPath}`;
 
-                        if (!compatibleLinks.find(l => l.target.fsPath == link.target.fsPath)) {
-                            compatibleLinks.push(link);
+                        if (!compatibleLinksImp.find(l => l.range == link.range)) {
+                            compatibleLinksImp.push(link);
                         }
                     }
 
@@ -1694,7 +1708,8 @@ export class DTSEngine implements
                                 const grepLines = fileMatch.split("\n");
                                 const matchDoc: DocMatchCache = {
                                     compatible: compatibleValues[j].val,
-                                    files: []
+                                    files: [],
+                                    notFound: false
                                 }
 
                                 for (let k = 0; k < grepLines.length; k++) {
@@ -1709,8 +1724,8 @@ export class DTSEngine implements
                                         link.tooltip = `${grepSlices[0]}`;
                                         matchDoc.files.push(dst);
 
-                                        if (!compatibleLinks.find(l => l.target.fsPath == link.target.fsPath)) {
-                                            compatibleLinks.push(link);
+                                        if (!compatibleLinksDoc.find(l => l.range == link.range)) {
+                                            compatibleLinksDoc.push(link);
                                         }
                                     }
                                 }
@@ -1718,11 +1733,19 @@ export class DTSEngine implements
                                 if (matchDoc.files.length > 0) {
                                     CompatibleMatchCache.DocCache.push(matchDoc);
                                 }
+                            } else {
+                                throw new Error("goto");
                             }
                         } catch (error) {
                             console.log(`Error creating DocumentLink DTS DOC`);
+                            const matchDoc: DocMatchCache = {
+                                compatible: compatibleValues[j].val,
+                                files: [],
+                                notFound: true
+                            }
+                            CompatibleMatchCache.DocCache.push(matchDoc);
                         }
-                    } else {
+                    } else if (!docMatch.notFound) {
                         for (let k = 0; k < docMatch.files.length; k++) {
                             const link = new vscode.DocumentLink(
                                 compatibleValues[j].loc.range,
@@ -1730,8 +1753,8 @@ export class DTSEngine implements
                             );
                             link.tooltip = `${docMatch.files[k].fsPath}`;
 
-                            if (!compatibleLinks.find(l => l.target.fsPath == link.target.fsPath)) {
-                                compatibleLinks.push(link);
+                            if (!compatibleLinksDoc.find(l => l.range == link.range)) {
+                                compatibleLinksDoc.push(link);
                             }
                         }
                     }
@@ -1740,6 +1763,7 @@ export class DTSEngine implements
         }
 
         _statusbarIndexing.hide();
-        return new Array<vscode.DocumentLink>().concat(includes, compatibleLinks);
+        return new Array<vscode.DocumentLink>().concat(includes,
+                compatibleLinksImp, compatibleLinksDoc);
     }
 }

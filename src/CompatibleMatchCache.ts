@@ -2,12 +2,14 @@ import * as vscode from 'vscode';
 
 export type MatchCache = {
     compatible: string
-    file: vscode.Uri
+    file: vscode.Uri,
+    notFound: boolean
 };
 
 export type DocMatchCache = {
     compatible: string,
-    files: vscode.Uri[]
+    files: vscode.Uri[],
+    notFound: boolean
 };
 
 export class CompatibleMatchCache {
