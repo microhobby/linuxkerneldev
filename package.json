@@ -6,7 +6,7 @@
 	"repository": {
 		"url": "https://github.com/microhobby/linuxkerneldev"
 	},
-	"version": "0.4.2",
+	"version": "0.4.4",
 	"keywords": [
 		"ctags",
 		"kernel",
@@ -269,6 +269,6 @@
 		"textindexer": "0.0.7",
 		"glob": "^7.1.5"
 	},
-	"icon": "res/icon.png",
+	"icon": "res/icon2.png",
 	"license": "MIT"
 }
