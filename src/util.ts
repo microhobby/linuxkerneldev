@@ -1,9 +1,33 @@
 import * as vscode from 'vscode';
 
 const channel = vscode.window.createOutputChannel('CTags');
+const __DEBUG__ = false;
 
 export function log(...args: any[]) {
-  args.unshift('vscode-ctags:');
-  console.log(...args);
-  channel.appendLine(args.join(' '));
+  if (__DEBUG__) {
+    args.unshift('vscode-ctags:');
+    console.log(...args);
+    channel.appendLine(args.join(' '));
+  }
+}
+
+var _timeTypingRef: NodeJS.Timeout;
+var _isTyping = false;
+var _callBackShow: (e: vscode.TextDocumentChangeEvent) => void;
+const _typeDelay = 1000;
+
+vscode.workspace.onDidChangeTextDocument(ev => {
+  _isTyping = true;
+  
+  clearTimeout(_timeTypingRef);
+  
+  _timeTypingRef = setTimeout(() => {
+    _isTyping = false;
+    _callBackShow(ev);
+  }, _typeDelay);
+});
+
+export function isTyping (call: (e: vscode.TextDocumentChangeEvent) => void): boolean {
+  _callBackShow = call;
+  return _isTyping;
 }
