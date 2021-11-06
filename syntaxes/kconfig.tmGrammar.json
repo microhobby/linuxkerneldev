@@ -67,7 +67,7 @@
             ]
         },
         {
-            "begin": "^(\\s*)(---help---|help)\\b",
+            "begin": "^(\\s*)(---help---|help)",
             "patterns": [
                 {
                     "include": "#helptext"
@@ -89,6 +89,26 @@
                 },
                 "2": {
                     "name": "support.variable"
+                }
+            },
+            "patterns": [
+                {
+                    "include": "#expression"
+                },
+                {
+                    "include": "#comment"
+                }
+            ]
+        },
+        {
+            "begin": "^(.*)(?=\\=)",
+            "end": "$",
+            "beginCaptures": {
+                "1": {
+                    "name": "support.variable"
+                },
+                "2": {
+                    "name": "keyword.control"
                 }
             },
             "patterns": [
