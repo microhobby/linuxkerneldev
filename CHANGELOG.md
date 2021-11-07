@@ -2,6 +2,10 @@
 
 All notable changes to the "linuxkerneldev" extension will be documented in this file.
 
+## [0.4.7]
+
+- 🧪 Experimental DTSEngine fixes
+
 ## [0.4.6]
 
 - 🧪 Experimental DTSEngine performance fixes
