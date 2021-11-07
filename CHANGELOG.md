@@ -2,6 +2,10 @@
 
 All notable changes to the "linuxkerneldev" extension will be documented in this file.
 
+## [0.4.9]
+
+- Fix edge case for device tree compatible not showing intellisense
+
 ## [0.4.8]
 
 - Now the user can use both DTSEngine and ctags for Device Tree Source lookup
