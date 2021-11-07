@@ -163,6 +163,8 @@ function regenerateCTags() {
 export function activate(context: vscode.ExtensionContext) {
 	const kerneldevConfig = vscode.workspace.getConfiguration('kerneldev');
 	const diagsDTC = vscode.languages.createDiagnosticCollection("dtc");
+	const ctagsConfig = vscode.workspace.getConfiguration('ctags');
+
 	util.log('extension activated.');
 
 	// time to work
@@ -317,7 +319,9 @@ export function activate(context: vscode.ExtensionContext) {
 		definitionsProvider
 	);
 
-	if (kerneldevConfig.experimental.newDtsEngine !== true) {
+	if (kerneldevConfig.experimental.newDtsEngine !== true
+		|| ctagsConfig.get<string[]>('languages', ['all']).includes('DTS')
+	) {
 		vscode.languages.registerDefinitionProvider(
 			{ scheme: 'file', language: 'dts' },
 			definitionsProvider
