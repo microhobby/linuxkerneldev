@@ -72,7 +72,14 @@ export class NodeType {
         Object.keys(tree).filter(k => k.endsWith('-cells')).forEach(k => {
             this._cells[k.slice(0, k.length - '-cells'.length)] = tree[k];
         });
-        this.compatible = tree.compatible ?? tree.properties?.compatible?.const ?? tree.name;
+        
+        // I really wanted the Linux Kernel to use something simpler like Zephyr
+        this.compatible = 
+            tree.compatible ??
+            tree.properties?.compatible?.const ??
+            tree.properties?.compatible?.oneOf?.[0]?.const ??
+            tree.name;
+        
         this.description = tree.description;
         this.filename = filename;
 
@@ -125,10 +132,10 @@ export class NodeType {
         this._properties = Object.assign(this._properties, standardProperties);
 
         for (const name in this._properties) {
-            if (typeof this._properties[name] == "object") {
+            //if (typeof this._properties[name] == "object") {
                 this._properties[name].name = name;
                 this._properties[name].node = this;
-            }
+            //}
         }
 
         if ('patternProperties' in tree) {
