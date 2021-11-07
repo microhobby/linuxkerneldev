@@ -617,7 +617,7 @@ export class TypeLoader {
                 return types;
             }
 
-            if (node.parent?.type.child) {
+            if (node.parent?.type?.child) {
                 return [node.parent.type.child];
             }
 
