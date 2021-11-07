@@ -2,6 +2,11 @@
 
 All notable changes to the "linuxkerneldev" extension will be documented in this file.
 
+## [0.4.8]
+
+- Now the user can use both DTSEngine and ctags for Device Tree Source lookup
+- 🧪 Experimental DTSEngine fixes
+
 ## [0.4.7]
 
 - 🧪 Experimental DTSEngine fixes
