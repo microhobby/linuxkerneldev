@@ -7,6 +7,7 @@ import { existsSync, readFile, writeFile, writeFileSync } from 'fs';
 import { capitalize } from './dtsUtil';
 import { LinuxNativeCommands } from './LinuxNativeCommands';
 import { CompatibleMatchCache, DocMatchCache } from './CompatibleMatchCache';
+import { delay } from './util';
 
 const _statusbarIndexing = vscode.window
     .createStatusBarItem(vscode.StatusBarAlignment.Left);
@@ -1613,7 +1614,12 @@ export class DTSEngine implements
             _statusbarIndexing.show();
             
             const nativeCmdHelper = new LinuxNativeCommands();
+
+            // TODO: we need to check why the first stable is not working
+            // TODO: this is a workaround
+            await delay(1000);
             await this.parser.stable();
+            
             const includes = this.parser.file(document.uri)?.includes.filter(i => i.loc.uri.fsPath === document.uri.fsPath).map(i => {
                 const link = new vscode.DocumentLink(i.loc.range, i.dst);
                 link.tooltip = i.dst.fsPath;

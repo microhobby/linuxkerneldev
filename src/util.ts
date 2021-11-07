@@ -31,3 +31,9 @@ export function isTyping (call: (e: vscode.TextDocumentChangeEvent) => void): bo
   _callBackShow = call;
   return _isTyping;
 }
+
+export async function delay (miliseconds: number): Promise<void> {
+  await new Promise((resolve) => {
+    setTimeout(resolve, miliseconds);
+  });
+}
