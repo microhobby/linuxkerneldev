@@ -1607,163 +1607,164 @@ export class DTSEngine implements
      * TODO
      */
     async provideDocumentLinks(document: vscode.TextDocument, token: vscode.CancellationToken): Promise<vscode.DocumentLink[]> {
-        await this.parser.stable();
-        _statusbarIndexing.text = `$(loading~spin) Indexing .dts file`;
-        _statusbarIndexing.show();
-        
-        const nativeCmdHelper = new LinuxNativeCommands();
-        await this.parser.stable();
-        const includes = this.parser.file(document.uri)?.includes.filter(i => i.loc.uri.fsPath === document.uri.fsPath).map(i => {
-            const link = new vscode.DocumentLink(i.loc.range, i.dst);
-            link.tooltip = i.dst.fsPath;
-            return link;
-        });
+        try {
+            await this.parser.stable();
+            _statusbarIndexing.text = `$(loading~spin) Indexing .dts file`;
+            _statusbarIndexing.show();
+            
+            const nativeCmdHelper = new LinuxNativeCommands();
+            await this.parser.stable();
+            const includes = this.parser.file(document.uri)?.includes.filter(i => i.loc.uri.fsPath === document.uri.fsPath).map(i => {
+                const link = new vscode.DocumentLink(i.loc.range, i.dst);
+                link.tooltip = i.dst.fsPath;
+                return link;
+            });
 
-        const nodes = this.parser.file(document.uri).entries.map(i => i.node);
-        let compatibles = nodes.map(node => {
-            const props = node.uniqueProperties();
-            const compatibleProp = props.find(p => p.name === 'compatible');
-            if (compatibleProp) {
-                return compatibleProp.value;
-            }
-        });
+            const nodes = this.parser.file(document.uri).entries.map(i => i.node);
+            let compatibles = nodes.map(node => {
+                const props = node.uniqueProperties();
+                const compatibleProp = props.find(p => p.name === 'compatible');
+                if (compatibleProp) {
+                    return compatibleProp.value;
+                }
+            });
 
-        const compatibleLinksImp = new Array<vscode.DocumentLink>();
-        const compatibleLinksDoc = new Array<vscode.DocumentLink>();
+            const compatibleLinksImp = new Array<vscode.DocumentLink>();
+            const compatibleLinksDoc = new Array<vscode.DocumentLink>();
 
-        for (let i=0; i < compatibles.length; i++) {
-            if (compatibles[i] && compatibles[i].length > 0
-                && compatibles[i][0].loc.uri === document.uri) {
-                const compatibleValues = compatibles[i];
-                for (let j = 0; j < compatibleValues.length; j++) {
-                    if (compatibleValues[j].val == "toradex,evalspi") {
-                        console.log("MAOE");
-                    }
+            for (let i=0; i < compatibles.length; i++) {
+                if (compatibles[i] && compatibles[i].length > 0
+                    && compatibles[i][0].loc.uri.fsPath === document.uri.fsPath) {
+                    const compatibleValues = compatibles[i];
+                    for (let j = 0; j < compatibleValues.length; j++) {
+                        const match = CompatibleMatchCache
+                            .Cache.find(i => i.compatible === compatibleValues[j].val);
 
-                    const match = CompatibleMatchCache
-                        .Cache.find(i => i.compatible === compatibleValues[j].val);
+                        const docMatch = CompatibleMatchCache
+                            .DocCache.find(i => i.compatible === compatibleValues[j].val);
 
-                    const docMatch = CompatibleMatchCache
-                        .DocCache.find(i => i.compatible === compatibleValues[j].val);
+                        if (!match) {
+                            // search for the match
+                            try {
+                                const fileMatch =
+                                    await nativeCmdHelper.asyncFindDeviceTreeMathc(
+                                        compatibleValues[j].val,
+                                        vscode.workspace.rootPath!
+                                    );
+                                if (fileMatch.trim() != "") {
+                                    const grepSlices = fileMatch.split(":");
+                                    const dst = vscode.Uri.parse(`${grepSlices[0]}#${grepSlices[1]}`);
+                                    const link = new vscode.DocumentLink(
+                                        compatibleValues[j].loc.range,
+                                        dst
+                                    );
 
-                    if (!match) {
-                        // search for the match
-                        try {
-                            const fileMatch =
-                                await nativeCmdHelper.asyncFindDeviceTreeMathc(
-                                    compatibleValues[j].val,
-                                    vscode.workspace.rootPath!
-                                );
-                            if (fileMatch.trim() != "") {
-                                const grepSlices = fileMatch.split(":");
-                                const dst = vscode.Uri.parse(`${grepSlices[0]}#${grepSlices[1]}`);
-                                const link = new vscode.DocumentLink(
-                                    compatibleValues[j].loc.range,
-                                    dst
-                                );
+                                    link.tooltip = `${grepSlices[0]}`;
 
-                                link.tooltip = `${grepSlices[0]}`;
+                                    if (!compatibleLinksImp.find(l => l.target.fsPath == link.target.fsPath)) {
+                                        compatibleLinksImp.push(link);
+                                    }
 
-                                if (!compatibleLinksImp.find(l => l.target.fsPath == link.target.fsPath)) {
-                                    compatibleLinksImp.push(link);
+                                    CompatibleMatchCache.Cache.push({
+                                        compatible: compatibleValues[j].val,
+                                        file: dst,
+                                        notFound: false
+                                    });
+                                } else {
+                                    throw new Error("goto");
                                 }
-
+                            } catch (error) {
+                                console.log(`Error creating DocumentLink DTS .C`);
                                 CompatibleMatchCache.Cache.push({
                                     compatible: compatibleValues[j].val,
-                                    file: dst,
-                                    notFound: false
+                                    file: undefined,
+                                    notFound: true
                                 });
-                            } else {
-                                throw new Error("goto");
                             }
-                        } catch (error) {
-                            console.log(`Error creating DocumentLink DTS .C`);
-                            CompatibleMatchCache.Cache.push({
-                                compatible: compatibleValues[j].val,
-                                file: undefined,
-                                notFound: true
-                            });
-                        }
-                    } else if (!match.notFound) {
-                        const link = new vscode.DocumentLink(
-                            compatibleValues[j].loc.range,
-                            match.file
-                        );
-                        link.tooltip = `${match.file.fsPath}`;
+                        } else if (!match.notFound) {
+                            const link = new vscode.DocumentLink(
+                                compatibleValues[j].loc.range,
+                                match.file
+                            );
+                            link.tooltip = `${match.file.fsPath}`;
 
-                        if (!compatibleLinksImp.find(l => l.range == link.range)) {
-                            compatibleLinksImp.push(link);
+                            if (!compatibleLinksImp.find(l => l.range == link.range)) {
+                                compatibleLinksImp.push(link);
+                            }
                         }
-                    }
 
-                    if (!docMatch) {
-                        // search for the match
-                        try {
-                            const fileMatch =
-                                await nativeCmdHelper.asyncFindDeviceTreeDoc(
-                                    compatibleValues[j].val,
-                                    vscode.workspace.rootPath!
-                                );
-                            if (fileMatch.trim() != "") {
-                                const grepLines = fileMatch.split("\n");
+                        if (!docMatch) {
+                            // search for the match
+                            try {
+                                const fileMatch =
+                                    await nativeCmdHelper.asyncFindDeviceTreeDoc(
+                                        compatibleValues[j].val,
+                                        vscode.workspace.rootPath!
+                                    );
+                                if (fileMatch.trim() != "") {
+                                    const grepLines = fileMatch.split("\n");
+                                    const matchDoc: DocMatchCache = {
+                                        compatible: compatibleValues[j].val,
+                                        files: [],
+                                        notFound: false
+                                    }
+
+                                    for (let k = 0; k < grepLines.length; k++) {
+                                        if (grepLines[k].trim() != "") {
+                                            const grepSlices = grepLines[k].split(":")
+                                            const dst = vscode.Uri.parse(`${grepSlices[0]}`);
+                                            const link = new vscode.DocumentLink(
+                                                compatibleValues[j].loc.range,
+                                                dst
+                                            );
+
+                                            link.tooltip = `${grepSlices[0]}`;
+                                            matchDoc.files.push(dst);
+
+                                            if (!compatibleLinksDoc.find(l => l.range == link.range)) {
+                                                compatibleLinksDoc.push(link);
+                                            }
+                                        }
+                                    }
+
+                                    if (matchDoc.files.length > 0) {
+                                        CompatibleMatchCache.DocCache.push(matchDoc);
+                                    }
+                                } else {
+                                    throw new Error("goto");
+                                }
+                            } catch (error) {
+                                console.log(`Error creating DocumentLink DTS DOC`);
                                 const matchDoc: DocMatchCache = {
                                     compatible: compatibleValues[j].val,
                                     files: [],
-                                    notFound: false
+                                    notFound: true
                                 }
-
-                                for (let k = 0; k < grepLines.length; k++) {
-                                    if (grepLines[k].trim() != "") {
-                                        const grepSlices = grepLines[k].split(":")
-                                        const dst = vscode.Uri.parse(`${grepSlices[0]}`);
-                                        const link = new vscode.DocumentLink(
-                                            compatibleValues[j].loc.range,
-                                            dst
-                                        );
-
-                                        link.tooltip = `${grepSlices[0]}`;
-                                        matchDoc.files.push(dst);
-
-                                        if (!compatibleLinksDoc.find(l => l.range == link.range)) {
-                                            compatibleLinksDoc.push(link);
-                                        }
-                                    }
-                                }
-
-                                if (matchDoc.files.length > 0) {
-                                    CompatibleMatchCache.DocCache.push(matchDoc);
-                                }
-                            } else {
-                                throw new Error("goto");
+                                CompatibleMatchCache.DocCache.push(matchDoc);
                             }
-                        } catch (error) {
-                            console.log(`Error creating DocumentLink DTS DOC`);
-                            const matchDoc: DocMatchCache = {
-                                compatible: compatibleValues[j].val,
-                                files: [],
-                                notFound: true
-                            }
-                            CompatibleMatchCache.DocCache.push(matchDoc);
-                        }
-                    } else if (!docMatch.notFound) {
-                        for (let k = 0; k < docMatch.files.length; k++) {
-                            const link = new vscode.DocumentLink(
-                                compatibleValues[j].loc.range,
-                                docMatch.files[k]
-                            );
-                            link.tooltip = `${docMatch.files[k].fsPath}`;
+                        } else if (!docMatch.notFound) {
+                            for (let k = 0; k < docMatch.files.length; k++) {
+                                const link = new vscode.DocumentLink(
+                                    compatibleValues[j].loc.range,
+                                    docMatch.files[k]
+                                );
+                                link.tooltip = `${docMatch.files[k].fsPath}`;
 
-                            if (!compatibleLinksDoc.find(l => l.range == link.range)) {
-                                compatibleLinksDoc.push(link);
+                                if (!compatibleLinksDoc.find(l => l.range == link.range)) {
+                                    compatibleLinksDoc.push(link);
+                                }
                             }
                         }
                     }
                 }
             }
-        }
 
-        _statusbarIndexing.hide();
-        return new Array<vscode.DocumentLink>().concat(includes,
-                compatibleLinksImp, compatibleLinksDoc);
+            _statusbarIndexing.hide();
+            return new Array<vscode.DocumentLink>().concat(includes,
+                    compatibleLinksImp, compatibleLinksDoc);
+        } catch (err) {
+            _statusbarIndexing.text = `$(error) Error trying to index ${path.basename(document.fileName)}`;
+            console.log(err);
+        }
     }
 }
