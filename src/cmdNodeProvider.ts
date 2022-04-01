@@ -28,6 +28,7 @@ export class LinuxDevCmdProvider
 	private getCmds(): Promise<CmdOption[]> {
 		return new Promise(resolve => {
 			var cmds: CmdOption[] = [];
+			const ctagsConfig = vscode.workspace.getConfiguration('ctags');
 
 			// create the cmds
 			// findDeviceTreeDoc
@@ -81,14 +82,16 @@ export class LinuxDevCmdProvider
 				}));
 
 			// generate the ctags
-			cmds.push(new CmdOption("Generate CTags from project", "cmd5",
-				vscode.TreeItemCollapsibleState.None,
-				"",
-				{
-					command: "embeddedLinuxDev.regenerateCTags",
-					title: '',
-					arguments: []
-				}));
+			if (!ctagsConfig.get<boolean>('disable', false)) {
+				cmds.push(new CmdOption("Generate CTags from project", "cmd5",
+					vscode.TreeItemCollapsibleState.None,
+					"",
+					{
+						command: "embeddedLinuxDev.regenerateCTags",
+						title: '',
+						arguments: []
+					}));
+			}
 
 			// return
 			resolve(cmds);

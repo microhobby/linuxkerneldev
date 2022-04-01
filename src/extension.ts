@@ -298,107 +298,111 @@ export function activate(context: vscode.ExtensionContext) {
 	}
 
 	// ctags
-	tags = new ctags.CTags(vscode.workspace.rootPath || '', tagsfile);
-	tags
-		.reindex()
-		.then(() => {
-			vscode.window.setStatusBarMessage('CTags index loaded',
-					2000);
-		})
-		.catch(() => {
-			return regenerateCTags();
-		});
+	if (!ctagsConfig.get<boolean>('disable', false)) {
+		tags = new ctags.CTags(vscode.workspace.rootPath || '', tagsfile);
+		tags
+			.reindex()
+			.then(() => {
+				vscode.window.setStatusBarMessage('CTags index loaded',
+						2000);
+			})
+			.catch(() => {
+				return regenerateCTags();
+			});
 
-	const definitionsProvider = new CTagsDefinitionProvider();
-	vscode.languages.registerDefinitionProvider(
-		{ scheme: 'file', language: 'cpp' },
-		definitionsProvider
-	);
-	vscode.languages.registerDefinitionProvider(
-		{ scheme: 'file', language: 'c' },
-		definitionsProvider
-	);
-
-	if (kerneldevConfig.experimental.newDtsEngine !== true
-		|| ctagsConfig.get<string[]>('languages', ['all']).includes('DTS')
-	) {
+		const definitionsProvider = new CTagsDefinitionProvider();
 		vscode.languages.registerDefinitionProvider(
-			{ scheme: 'file', language: 'dts' },
+			{ scheme: 'file', language: 'cpp' },
 			definitionsProvider
 		);
 		vscode.languages.registerDefinitionProvider(
-			{ scheme: 'file', language: 'dtsi' },
+			{ scheme: 'file', language: 'c' },
 			definitionsProvider
 		);
-	}
 
-	vscode.languages.registerDefinitionProvider(
-		{ scheme: 'file', language: 'kconfig' },
-		definitionsProvider
-	);
-	vscode.languages.registerDefinitionProvider(
-		{ scheme: 'file', language: 'makefile' },
-		definitionsProvider
-	);
-
-	const hoverProvider = new CTagsHoverProvider();
-	vscode.languages.registerHoverProvider(
-		{ scheme: 'file', language: 'c' },
-		hoverProvider
-	);
-	vscode.languages.registerHoverProvider(
-		{ scheme: 'file', language: 'cpp' },
-		hoverProvider
-	);
-	vscode.languages.registerHoverProvider(
-		{ scheme: 'file', language: 'dts' },
-		hoverProvider
-	);
-	vscode.languages.registerHoverProvider(
-		{ scheme: 'file', language: 'dtsi' },
-		hoverProvider
-	);
-	vscode.languages.registerHoverProvider(
-		{ scheme: 'file', language: 'kconfig' },
-		hoverProvider
-	);
-	vscode.languages.registerHoverProvider(
-		{ scheme: 'file', language: 'makefile' },
-		hoverProvider
-	);
-
-	const completionProvider = new CTagsCompletionProvider();
-	vscode.languages.registerCompletionItemProvider(
-		{ scheme: 'file', language: 'c' },
-		completionProvider
-	);
-	vscode.languages.registerCompletionItemProvider(
-		{ scheme: 'file', language: 'cpp' },
-		completionProvider
-	);
-	vscode.languages.registerCompletionItemProvider(
-		{ scheme: 'file', language: 'dts' },
-		completionProvider
-	);
-	vscode.languages.registerCompletionItemProvider(
-		{ scheme: 'file', language: 'dtsi' },
-		completionProvider
-	);
-	vscode.languages.registerCompletionItemProvider(
-		{ scheme: 'file', language: 'kconfig' },
-		completionProvider
-	);
-	vscode.languages.registerCompletionItemProvider(
-		{ scheme: 'file', language: 'makefile' },
-		completionProvider
-	);
-
-	const regenerateCTagsCommand = vscode.commands.registerCommand(
-		'embeddedLinuxDev.regenerateCTags',
-		() => {
-			regenerateCTags();
+		if (kerneldevConfig.experimental.newDtsEngine !== true
+			|| ctagsConfig.get<string[]>('languages', ['all']).includes('DTS')
+		) {
+			vscode.languages.registerDefinitionProvider(
+				{ scheme: 'file', language: 'dts' },
+				definitionsProvider
+			);
+			vscode.languages.registerDefinitionProvider(
+				{ scheme: 'file', language: 'dtsi' },
+				definitionsProvider
+			);
 		}
-	);
+
+		vscode.languages.registerDefinitionProvider(
+			{ scheme: 'file', language: 'kconfig' },
+			definitionsProvider
+		);
+		vscode.languages.registerDefinitionProvider(
+			{ scheme: 'file', language: 'makefile' },
+			definitionsProvider
+		);
+
+		const hoverProvider = new CTagsHoverProvider();
+		vscode.languages.registerHoverProvider(
+			{ scheme: 'file', language: 'c' },
+			hoverProvider
+		);
+		vscode.languages.registerHoverProvider(
+			{ scheme: 'file', language: 'cpp' },
+			hoverProvider
+		);
+		vscode.languages.registerHoverProvider(
+			{ scheme: 'file', language: 'dts' },
+			hoverProvider
+		);
+		vscode.languages.registerHoverProvider(
+			{ scheme: 'file', language: 'dtsi' },
+			hoverProvider
+		);
+		vscode.languages.registerHoverProvider(
+			{ scheme: 'file', language: 'kconfig' },
+			hoverProvider
+		);
+		vscode.languages.registerHoverProvider(
+			{ scheme: 'file', language: 'makefile' },
+			hoverProvider
+		);
+
+		const completionProvider = new CTagsCompletionProvider();
+		vscode.languages.registerCompletionItemProvider(
+			{ scheme: 'file', language: 'c' },
+			completionProvider
+		);
+		vscode.languages.registerCompletionItemProvider(
+			{ scheme: 'file', language: 'cpp' },
+			completionProvider
+		);
+		vscode.languages.registerCompletionItemProvider(
+			{ scheme: 'file', language: 'dts' },
+			completionProvider
+		);
+		vscode.languages.registerCompletionItemProvider(
+			{ scheme: 'file', language: 'dtsi' },
+			completionProvider
+		);
+		vscode.languages.registerCompletionItemProvider(
+			{ scheme: 'file', language: 'kconfig' },
+			completionProvider
+		);
+		vscode.languages.registerCompletionItemProvider(
+			{ scheme: 'file', language: 'makefile' },
+			completionProvider
+		);
+
+		const regenerateCTagsCommand = vscode.commands.registerCommand(
+			'embeddedLinuxDev.regenerateCTags',
+			() => {
+				regenerateCTags();
+			}
+		);
+
+		context.subscriptions.push(regenerateCTagsCommand);
+	}
 
 	// tree
 	// here begins the real code
@@ -475,8 +479,6 @@ export function activate(context: vscode.ExtensionContext) {
 	//context.subscriptions.push(disposable);
 	// tree
 
-	context.subscriptions.push(regenerateCTagsCommand);
-
 	vscode.workspace.onDidSaveTextDocument(event => {
 		util.log('saved', event.fileName, event.languageId);
 		const config = vscode.workspace.getConfiguration('ctags');
@@ -509,7 +511,9 @@ export function activate(context: vscode.ExtensionContext) {
 
 	// xperimental https://miro.medium.com/max/910/1*snTXFElFuQLSFDnvZKJ6IA.png
 	vscode.workspace.onDidChangeConfiguration(val => {
-		if (val.affectsConfiguration('kerneldev.experimental')) {
+		if (val.affectsConfiguration('kerneldev.experimental') ||
+			val.affectsConfiguration('ctags.disable')
+		) {
 			vscode.commands.executeCommand("workbench.action.reloadWindow");
 		}
 	});
