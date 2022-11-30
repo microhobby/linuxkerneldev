@@ -996,9 +996,9 @@ export class DTSEngine implements
             const parent = item['dts-parent'] as dts.Node;
             const snippet = new vscode.SnippetString();
             if (isAbsolutePath) {
-                snippet.appendText(item.label);
+                snippet.appendText(item.label as string);
             } else {
-                snippet.appendPlaceholder(item.label);
+                snippet.appendPlaceholder(item.label as string);
             }
 
             const addrCells = parent?.addrCells() ?? 2;
@@ -1080,7 +1080,7 @@ export class DTSEngine implements
 
                             snippet.appendText('>');
                         } else if (p.name === 'label') {
-                            insertValueSnippet(p, item.label.toUpperCase());
+                            insertValueSnippet(p, (item.label as string).toUpperCase());
                         } else if (p.type === 'phandle-array' && p.name.endsWith('-gpios') && defaultGpioController) {
                             snippet.appendText('<');
                             snippet.appendPlaceholder(`&${defaultGpioController.labels()[0] ?? '"' + defaultGpioController.path + '"'}`);
@@ -1146,7 +1146,7 @@ export class DTSEngine implements
                     completion.insertText.appendTabstop();
                     completion.insertText.appendText('\n};\n');
                 } else if (type === 'cell' && prop) {
-                    completion.insertText = new vscode.SnippetString(withAmp ? completion.label : l.label);
+                    completion.insertText = new vscode.SnippetString(withAmp ? (completion.label as string) : l.label);
                     l.node.refCellNames(prop)?.forEach(cell => {
                         (<vscode.SnippetString>completion.insertText).appendText(' ');
                         (<vscode.SnippetString>completion.insertText).appendPlaceholder(cell);
@@ -1202,7 +1202,7 @@ export class DTSEngine implements
                 item.detail = 'Define';
             }
 
-            if (item.label.startsWith('_')) { // Reserved defines go last
+            if ((item.label as string).startsWith('_')) { // Reserved defines go last
                 item.sortText = `~~~~${item.label}`;
             } else {
                 item.sortText = `~~~${item.label}`;
