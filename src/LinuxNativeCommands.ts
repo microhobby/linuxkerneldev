@@ -6,13 +6,16 @@ import * as os from 'os';
 
 export class LinuxNativeCommands {
 
-	private insider:string = "code";
+	private codeCmd:string = "code";
 
 	constructor()
 	{
 		// check if we are runnin on vs code insiders
 		if (vscode.version.indexOf("insider") !== -1) {
-			this.insider = "code-insiders";
+			this.codeCmd = "code-insiders";
+		// code-server ??
+		} else if (vscode.env.appHost.includes("server-distro")) {
+			this.codeCmd = "code-server";
 		}
 	}
 
@@ -30,7 +33,7 @@ export class LinuxNativeCommands {
 			);
 	
 			let child: any;
-			child = spawn(scriptPath, [pathSrc!, selected, this.insider]);
+			child = spawn(scriptPath, [pathSrc!, selected, this.codeCmd]);
 	
 			child.stdout.on('data', (data: string) => {
 				console.log(`stdout: ${data}`);
@@ -72,10 +75,10 @@ export class LinuxNativeCommands {
 		let child: any;
 
 		if (osPlatform !== "win32") {
-			child = spawn(scriptPath, [pathSrc!, selected, this.insider]);
+			child = spawn(scriptPath, [pathSrc!, selected, this.codeCmd]);
 		} else {
 			child = spawn("pwsh", [
-				"-NoProfile", scriptPath, pathSrc!, selected, this.insider
+				"-NoProfile", scriptPath, pathSrc!, selected, this.codeCmd
 			],{
 				shell: false,
 				windowsHide: true,
