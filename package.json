@@ -29,7 +29,8 @@
 		"onLanguage:makefile",
 		"onView:linuxDevCmdView",
 		"onCommand:embeddedLinuxDev.reloadCTags",
-		"onCommand:embeddedLinuxDev.regenerateCTags"
+		"onCommand:embeddedLinuxDev.regenerateCTags",
+		"onDebugResolve:crash"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -244,7 +245,72 @@
 				"scopeName": "source.dts",
 				"path": "./syntaxes/dts.tmLanguage.json"
 			}
-		]
+		],
+		"breakpoints": [
+            {
+                "language": "C"
+            }
+        ],
+        "debuggers": [
+            {
+                "type": "crash",
+                "languages": [
+                    "C"
+                ],
+                "label": "Crash Utility",
+                "runtime": "node",
+                "configurationAttributes": {
+                    "launch": {
+                        "required": [
+                            "crash",
+                            "vmlinux",
+                            "vmcore"
+                        ],
+                        "properties": {
+                            "crash": {
+                                "type": "string",
+                                "description": "Absolute path to the crash utility binary",
+                                "default": ""
+                            },
+                            "vmlinux": {
+                                "type": "string",
+                                "description": "Absolute path to the Kernel vmlinux with debug symbols",
+                                "default": ""
+                            },
+                            "vmcore": {
+                                "type": "string",
+                                "description": "Absolute path to the kdump vmcore",
+                                "default": ""
+                            }
+                        }
+                    }
+                },
+                "initialConfigurations": [
+                    {
+                        "type": "crash",
+                        "request": "launch",
+                        "name": "Run Crash Utility",
+                        "crash": "",
+                        "vmlinux": "",
+                        "vmcore": ""
+                    }
+                ],
+                "configurationSnippets": [
+                    {
+                        "label": "Crash Utility: Launch",
+                        "description": "A new configuration for 'debugging' a crash kdump vmcore",
+                        "body": {
+                            "type": "crash",
+                            "request": "launch",
+                            "name": "Run Crash Utility",
+                            "crash": "",
+                            "vmlinux": "",
+                            "vmcore": ""
+                        }
+                    }
+                ]
+            }
+        ]
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",
@@ -262,7 +328,9 @@
 		"mocha": "^10.1.0",
 		"tslint": "^5.20.0",
 		"typescript": "^4.9.3",
-		"vscode-test": "^1.2.2"
+		"vscode-test": "^1.2.2",
+		"@vscode/debugadapter": "^1.56.0",
+        "await-notify": "^1.0.1"
 	},
 	"dependencies": {
 		"glob": "^7.1.5",

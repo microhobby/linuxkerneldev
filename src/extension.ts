@@ -11,6 +11,7 @@ import { LinuxDevCmdProvider, CmdOption } from './cmdNodeProvider'
 import { LinuxNativeCommands } from './LinuxNativeCommands';
 import { DeviceTreeVSCodeDiags } from './DeviceTreeCompileVSCodeDiags';
 import { DTSEngine } from './DTSEngine';
+import { InlineDebugAdapter } from './InlineDebugAdapter';
 
 const tagsfile = '.vscode-ctags';
 let tags: ctags.CTags;
@@ -522,6 +523,9 @@ export function activate(context: vscode.ExtensionContext) {
 		const engine = new DTSEngine();
 		engine.activate(context);
 	}
+
+	// active crash debugger
+    InlineDebugAdapter.Activate(context);
 }
 
 export function deactivate() { }
