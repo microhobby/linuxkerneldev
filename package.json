@@ -303,9 +303,9 @@
                             "type": "crash",
                             "request": "launch",
                             "name": "Run Crash Utility",
-                            "crash": "",
-                            "vmlinux": "",
-                            "vmcore": ""
+                            "crash": "<your crash utility binary path>",
+                            "vmlinux": "<your vmlinux path>",
+                            "vmcore": "<your crash vmcore path>"
                         }
                     },
 					{
