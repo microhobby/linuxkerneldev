@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import * as path from 'fs';
 import {
     WorkspaceFolder,
     DebugConfiguration,
@@ -55,6 +56,40 @@ export class InlineDebugAdapter implements
         if (config.crash == null) {
             return vscode.window
                 .showInformationMessage("Crash cannot be empty")
+                .then(_ => {
+                    return undefined; // abort launch
+                });
+        } else if (!path.existsSync(config.crash)) {
+            return vscode.window
+                .showErrorMessage("Crash utility binary file does not found")
+                .then(_ => {
+                    return undefined; // abort launch
+                });
+        }
+
+        if (config.vmcore == null) {
+            return vscode.window
+                .showInformationMessage("vmcore cannot be empty")
+                .then(_ => {
+                    return undefined; // abort launch
+                });
+        } else if (!path.existsSync(config.vmcore)) {
+            return vscode.window
+                .showErrorMessage("vmcore crash file does not found")
+                .then(_ => {
+                    return undefined; // abort launch
+                });
+        }
+
+        if (config.vmlinux == null) {
+            return vscode.window
+                .showInformationMessage("vmlinux cannot be empty")
+                .then(_ => {
+                    return undefined; // abort launch
+                });
+        } else if (!path.existsSync(config.vmlinux)) {
+            return vscode.window
+                .showErrorMessage("vmlinux file does not found")
                 .then(_ => {
                     return undefined; // abort launch
                 });
