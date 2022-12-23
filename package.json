@@ -307,7 +307,38 @@
                             "vmlinux": "",
                             "vmcore": ""
                         }
-                    }
+                    },
+					{
+						"label": "KGDB aarch64",
+						"description": "Kernel GDB configurations for aarch64",
+						"body": {
+							"type": "cppdbg",
+							"name": "Kernel KDGB",
+							"request": "launch",
+							"program": "<your vmlinux path>",
+							"cwd": "^\"\\${workspaceFolder\\}\"",
+							"symbolLoadInfo": {
+								"loadAll": false,
+								"exceptionList": ""
+							},
+							"MIMode": "gdb",
+							"miDebuggerPath": "/usr/bin/gdb-multiarch",
+							"setupCommands": [
+								{
+									"description": "Enable pretty-printing for gdb",
+									"text": "-enable-pretty-printing",
+									"ignoreFailures": true
+								},
+								{
+									"text": "set arch aarch64"
+								},
+								{
+									"text": "target remote localhost:6061"
+								}
+							],
+							"preLaunchTask": "break-to-debug"
+						}
+					}
                 ]
             }
         ]
