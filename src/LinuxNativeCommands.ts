@@ -3,6 +3,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { spawn } from 'child_process';
 import * as os from 'os';
+import * as utils from './util';
+import { ExtensionUtils } from './Utils/ExtensionsUtils';
 
 export class LinuxNativeCommands {
 
@@ -196,6 +198,103 @@ export class LinuxNativeCommands {
 					os.platform()
 				);
 			}
+		}
+	}
+
+	private _checkForSetting (setting: string): string
+	{
+		const kerneldevConfig = vscode.workspace.getConfiguration('kerneldev');
+		
+		if (kerneldevConfig.has(setting)) {
+			return kerneldevConfig.get<string>(setting);
+		} else {
+			vscode.window.showErrorMessage(`Setting ${setting} not set`);
+			throw new Error("Setting not set");
+		}
+	}
+
+	startAgentProxy(): boolean
+	{
+		try {
+			const portKgdb = this._checkForSetting("kgdb_port");
+			const portSerial = this._checkForSetting("serial_port");
+			const serialDev = this._checkForSetting("serial_dev");
+			const serialBaudRate = this._checkForSetting("serial_baudRate");
+
+			let scriptPath: string = path.join(__filename,
+				"..",
+				"..",
+				"scripts",
+				"agentProxy.sh"
+			);
+	
+			const child = spawn(scriptPath, [
+				portSerial,
+				portKgdb,
+				serialDev,
+				serialBaudRate
+			]);
+	
+			child.stdout.on('data', (data: string) => {
+				console.log(`stdout: ${data}`);
+				utils.log(data.toString());
+
+				// connect to serial
+				void ExtensionUtils.runOnTerminal("telnet localhost 6060");
+			});
+	
+			child.stderr.on('data', (data: string) => {
+				console.error(`stderr: ${data}`);
+				utils.log(data.toString());
+			});
+			
+			child.on('close', (code: any) => {
+				console.log(`child process ${scriptPath} exited with code ${code}`);
+			});
+
+			return true;
+		} catch (e) {
+			return false;
+		}
+	}
+
+	breakKernelToDebug(): boolean
+	{
+		try {
+			const sshIp = this._checkForSetting("ssh_ip");
+			const sshPsswd = this._checkForSetting("ssh_psswd");
+			const sshLogin = this._checkForSetting("ssh_login");
+
+			let scriptPath: string = path.join(__filename,
+				"..",
+				"..",
+				"scripts",
+				"break.sh"
+			);
+
+			const child = spawn(scriptPath, [
+				sshPsswd,
+				sshLogin,
+				sshIp
+			]);
+
+			child.stdout.on('data', (data: string) => {
+				console.log(`stdout: ${data}`);
+				utils.log(data.toString());
+			});
+
+			child.stderr.on('data', (data: string) => {
+				console.error(`stderr: ${data}`);
+				utils.log(data.toString());
+			});
+			
+			child.on('close', (code: any) => {
+				console.log(`child process ${scriptPath} exited with code ${code}`);
+			});
+
+			return true;	
+		} catch (e) {
+			return false;
 		}
 	}
 }

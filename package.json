@@ -82,6 +82,10 @@
 					"light": "res/boolean.svg",
 					"dark": "res/boolean.svg"
 				}
+			},
+			{
+				"command": "embeddedLinuxDev.breakKernel",
+				"title": "Break the kernel to initialize the debug"
 			}
 		],
 		"configuration": [
@@ -129,6 +133,34 @@
 						"type": "boolean",
 						"markdownDescription": "Use the experimental Device Tree Source completion and lookup engine. (⚠️ Experimental features have not been fully tested and may have unexpected behavior)",
 						"default": false
+					},
+					"kerneldev.ssh_ip": {
+						"type": "string",
+						"markdownDescription": "Remote Embedded Linux IP address to debug"
+					},
+					"kerneldev.ssh_psswd": {
+						"type": "string",
+						"markdownDescription": "Remote Embedded Linux password to debug"
+					},
+					"kerneldev.ssh_login": {
+						"type": "string",
+						"markdownDescription": "Remote Embedded Linux login to debug"
+					},
+					"kerneldev.kgdb_port": {
+						"type": "string",
+						"markdownDescription": "The port number to be used by the telnet KGDB proxy"
+					},
+					"kerneldev.serial_port": {
+						"type": "string",
+						"markdownDescription": "The port number to be used by the telnet serial proxy"
+					},
+					"kerneldev.serial_baudRate": {
+						"type": "string",
+						"markdownDescription": "The serial baud rate to config the agent proxy connectino"
+					},
+					"kerneldev.serial_dev": {
+						"type": "string",
+						"markdownDescription": "The serial /dev/<name> to connect by the agent proxy"
 					}
 				}
 			},

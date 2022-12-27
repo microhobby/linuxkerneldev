@@ -165,6 +165,7 @@ export function activate(context: vscode.ExtensionContext) {
 	const kerneldevConfig = vscode.workspace.getConfiguration('kerneldev');
 	const diagsDTC = vscode.languages.createDiagnosticCollection("dtc");
 	const ctagsConfig = vscode.workspace.getConfiguration('ctags');
+	let in_kgdb_debug_session = false;
 
 	util.log('extension activated.');
 
@@ -476,6 +477,29 @@ export function activate(context: vscode.ExtensionContext) {
 					vscode.window.showErrorMessage(err);
 				});
 		});
+
+	vscode.commands.registerCommand(
+		'embeddedLinuxDev.breakKernel', (): string | undefined => {
+			const connected = 
+				nativeCmdsExecuter.startAgentProxy() ? "" : undefined;
+			
+			if (connected !== undefined) {
+				in_kgdb_debug_session = true;
+				return nativeCmdsExecuter.breakKernelToDebug() ? "" : undefined;
+			}
+		});
+
+	vscode.debug.onDidTerminateDebugSession((e) => {
+		if (in_kgdb_debug_session) {
+			in_kgdb_debug_session = false;
+		}
+	});
+
+	vscode.debug.onDidChangeBreakpoints((e) => {
+		if (in_kgdb_debug_session && e.added.length > 0) {
+			nativeCmdsExecuter.breakKernelToDebug();
+		}
+	});
 
 	//context.subscriptions.push(disposable);
 	// tree
