@@ -370,7 +370,7 @@
 									"text": "set arch aarch64"
 								},
 								{
-									"text": "target remote localhost:6061"
+									"text": "^\"target remote localhost:\\${config:kerneldev.kgdb_port\\}\""
 								}
 							],
 							"preLaunchTask": "break-to-debug"
