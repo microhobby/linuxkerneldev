@@ -4,8 +4,8 @@ Symbol autocompletion, function and symbol navigation. Supports C, Kconfig, defc
 
 ## Requirements
 
-The extension works on Linux systems, also tested on WSL, and uses some 
-packages for its correct operation. Before use you must install the following 
+The extension works on Linux systems, also tested on WSL, and uses some
+packages for its correct operation. Before use you must install the following
 dependencies on your system:
 
 - bash
@@ -19,7 +19,7 @@ An important detail is to install universal-ctags and not exuberant-ctags to hav
 
 ### Requirements
 
-The new DTS engine validate and compile the device tree source using the device tree compiler `dtc`. Before use you must install the following 
+The new DTS engine validate and compile the device tree source using the device tree compiler `dtc`. Before use you must install the following
 dependencies on your system:
 
 - device-tree-compiler
@@ -52,6 +52,109 @@ The new DTS Engine uses the `yaml` binding documentation to have completion tips
     "devicetree.bindings": [
         "${workspaceFolder}/Documentation/devicetree/bindings"
     ],
+```
+
+## 🧪 Experimental KGDB Support
+
+Now the extension has built-in tools to be able to easily start a debug session with [KGDB](https://www.kernel.org/doc/html/v4.15/dev-tools/kgdb.html). An example for launch configuration for attach to KGDB:
+
+```json
+    {
+        "type": "cppdbg",
+        "name": "Kernel KDGB",
+        "request": "launch",
+        "program": "/tmp/kernel/rpi/artifacts/bcm2711-rpi-4b/vmlinux",
+        "cwd": "${workspaceFolder}",
+        "symbolLoadInfo": {
+            "loadAll": false,
+            "exceptionList": ""
+        },
+        "MIMode": "gdb",
+        "miDebuggerPath": "/usr/bin/gdb-multiarch",
+        "setupCommands": [
+            {
+                "description": "Enable pretty-printing for gdb",
+                "text": "-enable-pretty-printing",
+                "ignoreFailures": true
+            },
+            {
+                "text": "set arch aarch64"
+            },
+            {
+                "text": "target remote localhost:${setting:kgdb_port}"
+            },
+        ],
+        "preLaunchTask": "${command:embeddedLinuxDev.breakKernel}"
+    },
+```
+ 
+There are some properties that need attention:
+
+- `program`
+    - It has to be the exactly Kernel `vmlinux` file you are trying to attach the debugger to;
+- `miDebuggerPath`
+    - You need the `gdb-multiarch` installed on your distro;
+- `setupCommands`
+    - In the `"text": "set arch aarch64"` you must put the architecture of the target you want to attach the debugger;
+- `preLaunchTask`
+    - Do not remove the command `${command:embeddedLinuxDev.breakKernel}`. If you need to add a custom task for your use case, don't forget to add the command call in the tasks pipeline as the last task to be executed. Is this command that initializes the `agent-proxy` that will share what is from `gdb` and what is from the session console;
+
+Para realizar o break do Kernel para inicializar a sessão de debug e enviar corretamente os breakpoints requeridos o comando `embeddedLinuxDev.breakKernel` precisa de alguns settings. São nexessários:
+
+```json
+    "kerneldev.kgdb_port": "6061",
+    "kerneldev.serial_port": "6060",
+```
+
+Essas portas serão utitilizadas pelo `agent-proxy` para criar sessões telnet para distribuir o que é do `gdb` e o que é do console normal do linux.
+
+O modo recomendado de colocar o Kernel Linux em modo de debug e por `Linux Magic System Request Key Hacks`:
+
+```json
+    "kerneldev.breakBySysrq": true
+```
+
+Mas caso queira executar o break via `ssh` use:
+
+> ⚠️ Executar o break via `ssh` é especialmente útil quando o seu device serial não suporta `BREAK`
+
+```json
+    "kerneldev.breakBySysrq": false,
+    "kerneldev.ssh_login": "seadog",
+    "kerneldev.ssh_psswd": "seadog",
+    "kerneldev.ssh_ip": "192.168.0.53",
+```
+
+## 🧪 Experimental Crash Utility Debugger Adapter
+
+A debugger adapter for crash utility https://github.com/crash-utility/crash was added. This new debugger adapter has type `crash`, example configuration for the `launch.json`:
+
+```json
+    {
+        "type": "crash",
+        "request": "launch",
+        "name": "Run Crash Utility",
+        "crash": "/tmp/crash/crash",
+        "vmlinux": "/tmp/kernel/rpi/artifacts/bcm2711-rpi-4b/vmlinux",
+        "vmcore": "/media/rootfs/var/log/vmcore"
+    }
+```
+
+Description of properties:
+
+```json
+"crash": {
+    "type": "string",
+    "description": "Absolute path to the crash utility binary"
+},
+"vmlinux": {
+    "type": "string",
+    "description": "Absolute path to the Kernel vmlinux with debug symbols"
+},
+"vmcore": {
+    "type": "string",
+    "description": "Absolute path to the kdump vmcore"
+}
 ```
 
 ## Features

@@ -2,6 +2,16 @@
 
 All notable changes to the "linuxkerneldev" extension will be documented in this file.
 
+## [0.5.0]
+
+- 🧪 Experimental Add KGDB support
+- 🧪 Experimental Add crash utility debugger adapter
+- Add launch configuration snippets for crash utility and KGDB
+- Fix npm audit issues
+- 2022 maintenance
+- Fix opening a new window on finding (by [@suzakuwcx](https://github.com/suzakuwcx))
+- Fix disabling ctags does not work (by [@Pzqqt](https://github.com/Pzqqt))
+
 ## [0.4.9]
 
 - Fix edge case for device tree compatible not showing intellisense
