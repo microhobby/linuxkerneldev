@@ -134,6 +134,11 @@
 						"markdownDescription": "Use the experimental Device Tree Source completion and lookup engine. (⚠️ Experimental features have not been fully tested and may have unexpected behavior)",
 						"default": false
 					},
+					"kerneldev.breakBySysrq": {
+						"type": "boolean",
+						"markdownDescription": "Use serial sysrq instead ssh to break the Kernel to debug mode",
+						"default": true
+					},
 					"kerneldev.ssh_ip": {
 						"type": "string",
 						"markdownDescription": "Remote Embedded Linux IP address to debug"

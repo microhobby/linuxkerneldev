@@ -479,13 +479,13 @@ export function activate(context: vscode.ExtensionContext) {
 		});
 
 	vscode.commands.registerCommand(
-		'embeddedLinuxDev.breakKernel', (): string | undefined => {
+		'embeddedLinuxDev.breakKernel', async (): Promise<string | undefined> => {
 			const connected = 
-				nativeCmdsExecuter.startAgentProxy() ? "" : undefined;
+				await nativeCmdsExecuter.startAgentProxy() ? "" : undefined;
 			
 			if (connected !== undefined) {
 				in_kgdb_debug_session = true;
-				return nativeCmdsExecuter.breakKernelToDebug() ? "" : undefined;
+				return await nativeCmdsExecuter.breakKernelToDebug() ? "" : undefined;
 			}
 		});
 

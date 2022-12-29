@@ -264,6 +264,27 @@ export class ExtensionUtils {
         });
     }
 
+    static runOnAndReturnTerminalRef (
+        title: string,
+        cmd: string
+    ): vscode.Terminal {
+        const term = vscode.window
+            .createTerminal({
+                name: `${title}`,
+                shellPath: "/bin/bash",
+                // eslint-disable-next-line spellcheck/spell-checker
+                shellArgs: ["--norc", "--noprofile"],
+                env: {
+                    PS1: ""
+                },
+                message: `Running ${PUBLISHER_NAME} cmd ${_termID}`
+            });
+        term.show();
+        term.sendText(`${cmd} ; exit`, true);
+
+        return term;
+    }
+
     static async runCommand (cmd: string, ...args: any[]): Promise<void> {
         return await vscode.commands.executeCommand(cmd, ...args);
     }
@@ -301,5 +322,9 @@ export class ExtensionUtils {
     static async getSecret (key: string): Promise<string | undefined> {
         const context = (this.Global.CONTEXT as vscode.ExtensionContext);
         return await context.secrets.get(key);
+    }
+
+    static async delay(ms: number): Promise<void> {
+        return new Promise( resolve => setTimeout(resolve, ms) );
     }
 }

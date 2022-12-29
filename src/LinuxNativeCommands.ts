@@ -9,6 +9,7 @@ import { ExtensionUtils } from './Utils/ExtensionsUtils';
 export class LinuxNativeCommands {
 
 	private codeCmd:string = "code";
+	private _serialTerminal: vscode.Terminal = null;
 
 	constructor()
 	{
@@ -33,10 +34,10 @@ export class LinuxNativeCommands {
 				"scripts",
 				name
 			);
-	
+
 			let child: any;
 			child = spawn(scriptPath, [pathSrc!, selected, this.codeCmd]);
-	
+
 			child.stdout.on('data', (data: string) => {
 				console.log(`stdout: ${data}`);
 				res(data.toString());
@@ -46,7 +47,7 @@ export class LinuxNativeCommands {
 				console.error(`stderr: ${data}`);
 				rej();
 			});
-			
+
 			child.on('close', (code: any) => {
 				if (code !== 0)
 					rej();
@@ -101,12 +102,12 @@ export class LinuxNativeCommands {
 				onSterr(`${data}`);
 			}
 		});
-		
+
 		child.on('close', (code: any) => {
 			console.log(`child process exited with code ${code}`);
 		});
 	}
-	
+
 	findAndOpenDeviceTreeDoc(selected: string, pathSrc?: string,
 		onStdout?: Function, onSterr?: Function): void
 	{
@@ -204,7 +205,7 @@ export class LinuxNativeCommands {
 	private _checkForSetting (setting: string): string
 	{
 		const kerneldevConfig = vscode.workspace.getConfiguration('kerneldev');
-		
+
 		if (kerneldevConfig.has(setting)) {
 			return kerneldevConfig.get<string>(setting);
 		} else {
@@ -213,7 +214,7 @@ export class LinuxNativeCommands {
 		}
 	}
 
-	startAgentProxy(): boolean
+	async startAgentProxy(): Promise<boolean>
 	{
 		try {
 			const portKgdb = this._checkForSetting("kgdb_port");
@@ -221,78 +222,102 @@ export class LinuxNativeCommands {
 			const serialDev = this._checkForSetting("serial_dev");
 			const serialBaudRate = this._checkForSetting("serial_baudRate");
 
-			let scriptPath: string = path.join(__filename,
-				"..",
-				"..",
-				"scripts",
-				"agentProxy.sh"
-			);
-	
-			const child = spawn(scriptPath, [
-				portSerial,
-				portKgdb,
-				serialDev,
-				serialBaudRate
-			]);
-	
-			child.stdout.on('data', (data: string) => {
-				console.log(`stdout: ${data}`);
-				utils.log(data.toString());
+			return await new Promise(resolve => {
+				let scriptPath: string = path.join(__filename,
+					"..",
+					"..",
+					"scripts",
+					"agentProxy.sh"
+				);
 
-				// connect to serial
-				void ExtensionUtils.runOnTerminal("telnet localhost 6060");
-			});
-	
-			child.stderr.on('data', (data: string) => {
-				console.error(`stderr: ${data}`);
-				utils.log(data.toString());
-			});
-			
-			child.on('close', (code: any) => {
-				console.log(`child process ${scriptPath} exited with code ${code}`);
-			});
+				const child = spawn(scriptPath, [
+					portSerial,
+					portKgdb,
+					serialDev,
+					serialBaudRate
+				]);
 
-			return true;
+				child.stdout.on('data', (data: string) => {
+					console.log(`stdout: ${data}`);
+					utils.log(data.toString());
+
+					// connect to serial
+					this._serialTerminal =
+						ExtensionUtils.runOnAndReturnTerminalRef(
+							"Serial Console",
+							`telnet localhost ${portSerial}`
+						);
+
+					resolve(true);
+				});
+
+				child.stderr.on('data', (data: string) => {
+					console.error(`stderr: ${data}`);
+					utils.log(data.toString());
+				});
+
+				child.on('close', (code: any) => {
+					this._serialTerminal = null;
+					console.log(`child process ${scriptPath} exited with code ${code}`);
+					resolve(false);
+				});
+			});
 		} catch (e) {
 			return false;
 		}
 	}
 
-	breakKernelToDebug(): boolean
+	async breakKernelToDebug(): Promise<boolean>
 	{
+		const bySysrq =  vscode.workspace
+			.getConfiguration('kerneldev').get<boolean>("breakBySysrq");
+		
 		try {
-			const sshIp = this._checkForSetting("ssh_ip");
-			const sshPsswd = this._checkForSetting("ssh_psswd");
-			const sshLogin = this._checkForSetting("ssh_login");
+			if (!bySysrq) {
+				const sshIp = this._checkForSetting("ssh_ip");
+				const sshPsswd = this._checkForSetting("ssh_psswd");
+				const sshLogin = this._checkForSetting("ssh_login");
 
-			let scriptPath: string = path.join(__filename,
-				"..",
-				"..",
-				"scripts",
-				"break.sh"
-			);
+				let scriptPath: string = path.join(__filename,
+					"..",
+					"..",
+					"scripts",
+					"break.sh"
+				);
 
-			const child = spawn(scriptPath, [
-				sshPsswd,
-				sshLogin,
-				sshIp
-			]);
+				const child = spawn(scriptPath, [
+					sshPsswd,
+					sshLogin,
+					sshIp
+				]);
 
-			child.stdout.on('data', (data: string) => {
-				console.log(`stdout: ${data}`);
-				utils.log(data.toString());
-			});
+				child.stdout.on('data', (data: string) => {
+					console.log(`stdout: ${data}`);
+					utils.log(data.toString());
+				});
 
-			child.stderr.on('data', (data: string) => {
-				console.error(`stderr: ${data}`);
-				utils.log(data.toString());
-			});
-			
-			child.on('close', (code: any) => {
-				console.log(`child process ${scriptPath} exited with code ${code}`);
-			});
+				child.stderr.on('data', (data: string) => {
+					console.error(`stderr: ${data}`);
+					utils.log(data.toString());
+				});
 
-			return true;	
+				child.on('close', (code: any) => {
+					console.log(`child process ${scriptPath} exited with code ${code}`);
+				});
+			} else {
+				await ExtensionUtils.delay(500);
+
+				if (this._serialTerminal != null) {
+					// send the telnet scape char
+					this._serialTerminal.sendText("\x1D");
+					await ExtensionUtils.delay(100);
+					this._serialTerminal.sendText(`send break\n`);
+					await ExtensionUtils.delay(100);
+					this._serialTerminal.sendText(`g\n`);
+				}
+			}
+
+			return true;
 		} catch (e) {
 			return false;
 		}
