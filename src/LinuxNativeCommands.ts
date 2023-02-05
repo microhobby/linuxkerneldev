@@ -322,4 +322,16 @@ export class LinuxNativeCommands {
 			return false;
 		}
 	}
+
+	generateBitBakeCtags(
+		pathSrc?: string,
+		onStdout?: Function, onSterr?: Function
+	): void {
+		// resolve and run
+		this.createScriptSpawn(
+			"generateBitBakeCtags.sh", 
+			"null",
+			pathSrc, onStdout, onSterr
+		);
+	}
 }

@@ -93,6 +93,18 @@ export class LinuxDevCmdProvider
 					}));
 			}
 
+			// generate the ctags
+			if (!ctagsConfig.get<boolean>('disable', false)) {
+				cmds.push(new CmdOption("Generate BitBake CTags from project", "cmd6",
+					vscode.TreeItemCollapsibleState.None,
+					"",
+					{
+						command: "embeddedLinuxDev.generateBitBakeCtags",
+						title: '',
+						arguments: []
+					}));
+			}
+
 			// return
 			resolve(cmds);
 		});
