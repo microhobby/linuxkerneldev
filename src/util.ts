@@ -23,7 +23,11 @@ vscode.workspace.onDidChangeTextDocument(ev => {
   
   _timeTypingRef = setTimeout(() => {
     _isTyping = false;
-    _callBackShow(ev);
+
+    if (_callBackShow != null) {
+      _callBackShow(ev);
+    }
+  
   }, _typeDelay);
 });
 
