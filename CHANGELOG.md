@@ -2,6 +2,10 @@
 
 All notable changes to the "linuxkerneldev" extension will be documented in this file.
 
+## [0.5.6]
+- Fix issue with agent-proxy not being up;
+- Update KGDB snippets to use new KGDB extension;
+
 ## [0.5.1]
 
 - Fix an issue with wrong development dependency set

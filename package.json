@@ -6,7 +6,7 @@
 	"repository": {
 		"url": "https://github.com/microhobby/linuxkerneldev"
 	},
-	"version": "0.5.3",
+	"version": "0.5.6",
 	"keywords": [
 		"ctags",
 		"kernel",
@@ -355,31 +355,27 @@
 						"label": "KGDB aarch64",
 						"description": "Kernel GDB configurations for aarch64",
 						"body": {
-							"type": "cppdbg",
-							"name": "Kernel KDGB",
+							"type": "kgdb",
 							"request": "launch",
-							"program": "<your vmlinux path>",
+							"name": "Kernel KGDB",
+							"program": "<vmlinux path>",
 							"cwd": "^\"\\${workspaceFolder\\}\"",
-							"symbolLoadInfo": {
-								"loadAll": false,
-								"exceptionList": ""
+							"remote": {
+								"enabled": true,
+								"address": "^\"localhost:\\${config:kerneldev.kgdb_port\\}\"",
+								"mode": "remote",
+								"execfile": "<vmlinux path>"
 							},
-							"MIMode": "gdb",
-							"miDebuggerPath": "/usr/bin/gdb-multiarch",
-							"setupCommands": [
-								{
-									"description": "Enable pretty-printing for gdb",
-									"text": "-enable-pretty-printing",
-									"ignoreFailures": true
-								},
-								{
-									"text": "set arch aarch64"
-								},
-								{
-									"text": "^\"target remote localhost:\\${config:kerneldev.kgdb_port\\}\""
-								}
+							"internalConsoleOptions": "neverOpen",
+							"debuggerPath": "/usr/bin/gdb-multiarch",
+							"commandsBeforeExec": [
+								"-enable-pretty-printing",
+								"set print pretty on",
+								"set arch aarch64",
+								"set substitute-path <from binary> <your local>", 
+								"add-symbol-file <path to your local .ko file> <text section> -s .bss <bss section> -s .data <data section>"
 							],
-							"preLaunchTask": "break-to-debug"
+							"preLaunchTask": "${command:embeddedLinuxDev.breakKernel}"
 						}
 					}
                 ]
