@@ -81,13 +81,13 @@ Now the extension has built-in tools to be able to easily start a debug session 
                 "text": "set arch aarch64"
             },
             {
-                "text": "target remote localhost:${setting:kgdb_port}"
+                "text": "target remote localhost:${config:kerneldev.kgdb_port}"
             },
         ],
         "preLaunchTask": "${command:embeddedLinuxDev.breakKernel}"
     },
 ```
- 
+
 There are some properties that need attention:
 
 - `program`
