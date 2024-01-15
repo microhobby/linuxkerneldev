@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 
 const channel = vscode.window.createOutputChannel('CTags');
-const __DEBUG__ = false;
+const __DEBUG__ = true;
 
 export function log(...args: any[]) {
   if (__DEBUG__) {
