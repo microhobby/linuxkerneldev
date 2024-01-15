@@ -343,10 +343,6 @@ export function activate(context: vscode.ExtensionContext) {
 			{ scheme: 'file', language: 'makefile' },
 			definitionsProvider
 		);
-		vscode.languages.registerDefinitionProvider(
-			{ scheme: 'file', language: 'bitbake' },
-			definitionsProvider
-		);
 
 		const hoverProvider = new CTagsHoverProvider();
 		vscode.languages.registerHoverProvider(
@@ -371,10 +367,6 @@ export function activate(context: vscode.ExtensionContext) {
 		);
 		vscode.languages.registerHoverProvider(
 			{ scheme: 'file', language: 'makefile' },
-			hoverProvider
-		);
-		vscode.languages.registerHoverProvider(
-			{ scheme: 'file', language: 'bitbake' },
 			hoverProvider
 		);
 
@@ -403,23 +395,6 @@ export function activate(context: vscode.ExtensionContext) {
 			{ scheme: 'file', language: 'makefile' },
 			completionProvider
 		);
-		vscode.languages.registerCompletionItemProvider(
-			{ scheme: 'file', language: 'bitbake' },
-			completionProvider
-		);
-
-		const generateBitbake = vscode.commands.registerCommand(
-			'embeddedLinuxDev.generateBitBakeCtags', () => {
-				nativeCmdsExecuter.generateBitBakeCtags(
-					vscode.workspace.rootPath,
-					(data: string) => {
-						vscode.window.setStatusBarMessage(data);
-					},
-					(err: string) => {
-						vscode.window.showErrorMessage(err);
-					}
-				);
-			});
 
 		const regenerateCTagsCommand = vscode.commands.registerCommand(
 			'embeddedLinuxDev.regenerateCTags',
@@ -429,7 +404,6 @@ export function activate(context: vscode.ExtensionContext) {
 		);
 
 		context.subscriptions.push(regenerateCTagsCommand);
-		context.subscriptions.push(generateBitbake);
 	}
 
 	// tree
@@ -506,9 +480,9 @@ export function activate(context: vscode.ExtensionContext) {
 
 	vscode.commands.registerCommand(
 		'embeddedLinuxDev.breakKernel', async (): Promise<string | undefined> => {
-			const connected = 
+			const connected =
 				await nativeCmdsExecuter.startAgentProxy() ? "" : undefined;
-			
+
 			if (connected !== undefined) {
 				in_kgdb_debug_session = true;
 				return await nativeCmdsExecuter.breakKernelToDebug() ? "" : undefined;

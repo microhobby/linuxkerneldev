@@ -23,16 +23,11 @@
 	"activationEvents": [
 		"onLanguage:c",
 		"onLanguage:makefile",
-		"onDebugResolve:crash",
-		"onLanguage:bitbake"
+		"onDebugResolve:crash"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
 		"commands": [
-			{
-				"command": "embeddedLinuxDev.generateBitBakeCtags",
-				"title": "Ctags Support: Generate BitBake Ctags"
-			},
 			{
 				"command": "embeddedLinuxDev.regenerateCTags",
 				"title": "Ctags Support: regenerate tags file"

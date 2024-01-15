@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 
-export class LinuxDevCmdProvider 
+export class LinuxDevCmdProvider
 	implements vscode.TreeDataProvider<vscode.TreeItem> {
 
 	constructor(private workspaceRoot: string | undefined) {}
@@ -93,18 +93,6 @@ export class LinuxDevCmdProvider
 					}));
 			}
 
-			// generate the ctags
-			if (!ctagsConfig.get<boolean>('disable', false)) {
-				cmds.push(new CmdOption("Generate BitBake CTags from project", "cmd6",
-					vscode.TreeItemCollapsibleState.None,
-					"",
-					{
-						command: "embeddedLinuxDev.generateBitBakeCtags",
-						title: '',
-						arguments: []
-					}));
-			}
-
 			// return
 			resolve(cmds);
 		});
@@ -115,14 +103,14 @@ export class CmdOption extends vscode.TreeItem {
 	constructor(
 		public readonly label: string,
 		public ip: string,
-		public readonly collapsibleState: 
+		public readonly collapsibleState:
 			vscode.TreeItemCollapsibleState,
 		public desc: string,
 		public readonly command?: vscode.Command
 	) {
 		super(label, collapsibleState);
 	}
-	
+
 	// @ts-ignore
 	get tooltip(): string {
 		return `${this.label}`;
@@ -135,17 +123,17 @@ export class CmdOption extends vscode.TreeItem {
 
 	iconPath = {
 		light: path.join(
-			__filename, 
-			'..', 
-			'..', 
-			'res', 
+			__filename,
+			'..',
+			'..',
+			'res',
 			'boolean.svg'
 		),
 		dark: path.join(
-			__filename, 
-			'..', 
-			'..', 
-			'res', 
+			__filename,
+			'..',
+			'..',
+			'res',
 			'boolean.svg'
 		)
 	};
