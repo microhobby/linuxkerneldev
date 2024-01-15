@@ -1612,17 +1612,43 @@ export class DTSEngine implements
             await this.parser.stable();
             _statusbarIndexing.text = `$(loading~spin) Indexing .dts file`;
             _statusbarIndexing.show();
-            
+
             const nativeCmdHelper = new LinuxNativeCommands();
 
             // TODO: we need to check why the first stable is not working
             // TODO: this is a workaround
             await delay(1000);
             await this.parser.stable();
-            
+
             const includes = this.parser.file(document.uri)?.includes.filter(i => i.loc.uri.fsPath === document.uri.fsPath).map(i => {
                 const link = new vscode.DocumentLink(i.loc.range, i.dst);
-                link.tooltip = i.dst.fsPath;
+
+                // fixup the include prefixes
+                let fixup = i.dst.fsPath;
+                if (fixup.includes("scripts/dtc/include-prefixes")) {
+                    if (fixup.includes("dt-bindings")) {
+                        // dt-bindinds is a edge case
+                        fixup = fixup.replace("scripts/dtc/include-prefixes", "include/dt-bindings");
+                    } else {
+                        // is an arch path
+                        // so, get first the arch
+                        const lastF = fixup.indexOf("include-prefixes/");
+                        // this will get the /arc/ will be the substring from
+                        // include-prefixes/ as start and until the next /
+                        const archS = fixup.substring(
+                            lastF + 17, fixup.indexOf("/", lastF + 18)
+                        );
+                        fixup = fixup.replace(
+                            `scripts/dtc/include-prefixes/${archS}`,
+                            `arch/${archS}/boot/dts`
+                        );
+                    }
+                }
+
+                // replace the target and the tooltip
+                link.target = vscode.Uri.parse(fixup);
+                link.tooltip = fixup;
+
                 return link;
             });
 
