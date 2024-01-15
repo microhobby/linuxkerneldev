@@ -21,7 +21,6 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:embeddedLinuxDev.helloWorld",
 		"onLanguage:c",
 		"onLanguage:makefile",
 		"onDebugResolve:crash",
