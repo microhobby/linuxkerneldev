@@ -6,7 +6,7 @@
 	"repository": {
 		"url": "https://github.com/microhobby/linuxkerneldev"
 	},
-	"version": "0.5.6",
+	"version": "0.5.8",
 	"keywords": [
 		"ctags",
 		"kernel",
@@ -15,7 +15,7 @@
 		"tree"
 	],
 	"engines": {
-		"vscode": "^1.72.0"
+		"vscode": "^1.80.0"
 	},
 	"categories": [
 		"Other"
@@ -23,14 +23,7 @@
 	"activationEvents": [
 		"onCommand:embeddedLinuxDev.helloWorld",
 		"onLanguage:c",
-		"onLanguage:dts",
-		"onLanguage:dtsi",
-		"onLanguage:kconfig",
 		"onLanguage:makefile",
-		"onView:linuxDevCmdView",
-		"onCommand:embeddedLinuxDev.reloadCTags",
-		"onCommand:embeddedLinuxDev.regenerateCTags",
-		"onCommand:embeddedLinuxDev.generateBitBakeCtags",
 		"onDebugResolve:crash",
 		"onLanguage:bitbake"
 	],
@@ -372,7 +365,7 @@
 								"-enable-pretty-printing",
 								"set print pretty on",
 								"set arch aarch64",
-								"set substitute-path <from binary> <your local>", 
+								"set substitute-path <from binary> <your local>",
 								"add-symbol-file <path to your local .ko file> <text section> -s .bss <bss section> -s .data <data section>"
 							],
 							"preLaunchTask": "${command:embeddedLinuxDev.breakKernel}"
