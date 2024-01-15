@@ -523,7 +523,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	vscode.debug.onDidChangeBreakpoints((e) => {
 		if (in_kgdb_debug_session && e.added.length > 0) {
-			nativeCmdsExecuter.breakKernelToDebug();
+			nativeCmdsExecuter.breakKernelToDebug(100);
 		}
 	});
 

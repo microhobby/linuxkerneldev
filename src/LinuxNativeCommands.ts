@@ -267,42 +267,53 @@ export class LinuxNativeCommands {
 		}
 	}
 
-	async breakKernelToDebug(): Promise<boolean>
+	async breakKernelToDebug(_delay: number = 5000): Promise<boolean>
 	{
 		const bySysrq =  vscode.workspace
 			.getConfiguration('kerneldev').get<boolean>("breakBySysrq");
-		
+
 		try {
 			if (!bySysrq) {
-				const sshIp = this._checkForSetting("ssh_ip");
-				const sshPsswd = this._checkForSetting("ssh_psswd");
-				const sshLogin = this._checkForSetting("ssh_login");
+				return new Promise(resolve => {
+					const sshIp = this._checkForSetting("ssh_ip");
+					const sshPsswd = this._checkForSetting("ssh_psswd");
+					const sshLogin = this._checkForSetting("ssh_login");
 
-				let scriptPath: string = path.join(__filename,
-					"..",
-					"..",
-					"scripts",
-					"break.sh"
-				);
+					let scriptPath: string = path.join(__filename,
+						"..",
+						"..",
+						"scripts",
+						"break.sh"
+					);
 
-				const child = spawn(scriptPath, [
-					sshPsswd,
-					sshLogin,
-					sshIp
-				]);
+					const child = spawn(scriptPath, [
+						sshPsswd,
+						sshLogin,
+						sshIp
+					]);
 
-				child.stdout.on('data', (data: string) => {
-					console.log(`stdout: ${data}`);
-					utils.log(data.toString());
-				});
+					child.stdout.on('data', (data: string) => {
+						console.log(`stdout: ${data}`);
+						utils.log(data.toString());
+						utils.delay(_delay).then(() => {
+							resolve(true);
+						});
+					});
 
-				child.stderr.on('data', (data: string) => {
-					console.error(`stderr: ${data}`);
-					utils.log(data.toString());
-				});
+					child.stderr.on('data', (data: string) => {
+						console.error(`stderr: ${data}`);
+						utils.log(data.toString());
+						utils.delay(_delay).then(() => {
+							resolve(true);
+						});
+					});
 
-				child.on('close', (code: any) => {
-					console.log(`child process ${scriptPath} exited with code ${code}`);
+					child.on('close', (code: any) => {
+						console.log(`child process ${scriptPath} exited with code ${code}`);
+						utils.delay(_delay).then(() => {
+							resolve(true);
+						});
+					});
 				});
 			} else {
 				await ExtensionUtils.delay(500);
@@ -329,7 +340,7 @@ export class LinuxNativeCommands {
 	): void {
 		// resolve and run
 		this.createScriptSpawn(
-			"generateBitBakeCtags.sh", 
+			"generateBitBakeCtags.sh",
 			"null",
 			pathSrc, onStdout, onSterr
 		);
