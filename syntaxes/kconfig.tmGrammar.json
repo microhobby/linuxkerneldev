@@ -7,200 +7,90 @@
         {
             "begin": "^\\s*(if)\\s+",
             "end": "$",
-            "beginCaptures": {
-                "1": {
-                    "name": "keyword.control"
-                }
-            },
-            "patterns": [
-                {
-                    "include": "#expression"
-                },
-                {
-                    "include": "#comment"
-                }
-            ]
+            "beginCaptures": { "1": { "name": "keyword.control" } },
+            "patterns": [{ "include": "#expression" }, { "include": "#comment" }]
         },
         {
             "match": "^\\s*(endif|endchoice|endmenu|optional)\\b",
-            "captures": {
-                "1": {
-                    "name": "keyword.control"
-                }
-            }
+            "captures": { "1": { "name": "keyword.control" } }
         },
         {
-            "begin": "^\\s*(config|menuconfig|choice|imply)\\s+",
+            "begin": "^\\s*(config|menuconfig|choice|configdefault)\\s+",
             "end": "(\\s|$)",
-            "beginCaptures": {
-                "1": {
-                    "name": "keyword.control"
-                }
-            },
-            "patterns": [
-                {
-                    "include": "#symbol"
-                },
-                {
-                    "include": "#comment"
-                }
-            ]
+            "beginCaptures": { "1": { "name": "keyword.control" } },
+            "patterns": [{ "include": "#symbol" }, { "include": "#comment" }]
         },
         {
             "begin": "^\\s*(range)\\s+",
             "end": "$",
             "beginCaptures": {
-                "1": {
-                    "name": "keyword.control"
-                }
+                "1": { "name": "keyword.control" }
             },
             "patterns": [
-                {
-                    "include": "#if"
-                },
-                {
-                    "include": "#expression"
-                },
-                {
-                    "include": "#comment"
-                }
+                { "include": "#if" },
+                { "include": "#expression" },
+                { "include": "#comment" }
             ]
         },
         {
-            "begin": "^(\\s*)(---help---|help)",
-            "patterns": [
-                {
-                    "include": "#helptext"
-                }
-            ],
+            "begin": "^(\\s*)(---help---|help)\\b",
+            "patterns": [{ "include": "#helptext" }],
             "end": "^(?!\\1\\s+|$)",
-            "beginCaptures": {
-                "2": {
-                    "name": "keyword.control"
-                }
-            }
+            "beginCaptures": { "2": { "name": "keyword.control" } }
         },
         {
             "begin": "\\b(option)\\s+(defconfig_list|modules|allnoconfig_y)=?",
             "end": "$",
             "beginCaptures": {
-                "1": {
-                    "name": "keyword.control"
-                },
-                "2": {
-                    "name": "support.variable"
-                }
+                "1": { "name": "keyword.control" },
+                "2": { "name": "support.variable" }
             },
-            "patterns": [
-                {
-                    "include": "#expression"
-                },
-                {
-                    "include": "#comment"
-                }
-            ]
-        },
-        {
-            "begin": "^(.*)(?=\\=)",
-            "end": "$",
-            "beginCaptures": {
-                "1": {
-                    "name": "support.variable"
-                },
-                "2": {
-                    "name": "keyword.control"
-                }
-            },
-            "patterns": [
-                {
-                    "include": "#expression"
-                },
-                {
-                    "include": "#comment"
-                }
-            ]
+            "patterns": [{ "include": "#expression" }, { "include": "#comment" }]
         },
         {
             "begin": "^\\s*(bool|tristate|string|hex|int)\\s+",
             "end": "$",
-            "beginCaptures": {
-                "1": {
-                    "name": "storage.type"
-                }
-            },
-            "patterns": [
-                {
-                    "include": "#string"
-                },
-                {
-                    "include": "#if"
-                },
-                {
-                    "include": "#comment"
-                }
-            ]
+            "beginCaptures": { "1": { "name": "storage.type" } },
+            "patterns": [{ "include": "#string" }, { "include": "#if" }, { "include": "#comment" }]
         },
         {
             "begin": "^\\s*(visible if|depends on)\\s+",
             "end": "$",
-            "beginCaptures": {
-                "1": {
-                    "name": "keyword.control"
-                }
-            },
-            "patterns": [
-                {
-                    "include": "#expression"
-                },
-                {
-                    "include": "#comment"
-                }
-            ]
+            "beginCaptures": { "1": { "name": "keyword.control" } },
+            "patterns": [{ "include": "#expression" }, { "include": "#comment" }]
         },
         {
-            "begin": "^\\s*(select|default|def_bool|def_tristate)\\s+",
+            "begin": "^\\s*(select|default|def_bool|def_tristate|imply)\\s+",
             "end": "$",
-            "beginCaptures": {
-                "1": {
-                    "name": "keyword.control"
-                }
-            },
+            "beginCaptures": { "1": { "name": "keyword.control" } },
             "patterns": [
-                {
-                    "include": "#if"
-                },
-                {
-                    "include": "#expression"
-                },
-                {
-                    "include": "#comment"
-                }
+                { "include": "#if" },
+                { "include": "#expression" },
+                { "include": "#comment" }
             ]
         },
         {
             "begin": "^\\s*(prompt|source|rsource|osource|orsource|mainmenu|menu|comment)\\s+",
             "end": "$",
-            "beginCaptures": {
-                "1": {
-                    "name": "keyword.control"
-                }
-            },
-            "patterns": [
-                {
-                    "include": "#string"
-                },
-                {
-                    "include": "#if"
-                },
-                {
-                    "include": "#comment"
-                }
-            ]
+            "beginCaptures": { "1": { "name": "keyword.control" } },
+            "patterns": [{ "include": "#string" }, { "include": "#if" }, { "include": "#comment" }]
+        },
+        {
+            "begin": "^\\s*(.*?)\\s*(:?=)\\s*(.*)",
+            "end": "$",
+            "captures": {
+                "1": { "name": "entity.name.function.preprocessor" },
+                "2": { "name": "keyword.operator.assignment" },
+                "3": { "patterns": [{ "include": "#expression" }] }
+            }
+        },
+        {
+            "include": "#invalid"
         }
     ],
     "repository": {
         "comment": {
-            "match": "#.*",
+            "match": "\\s*#.*",
             "name": "comment.line"
         },
         "string": {
@@ -240,15 +130,18 @@
                 },
                 {
                     "include": "#line-continuation"
+                },
+                {
+                    "include": "#macro-reference"
                 }
             ]
         },
         "expression-operators": {
-            "match": "(=|!=|<|>|<=|>=|!|&&|\\|\\|\\(|\\))",
-            "name": "keyword.operator"
+            "match": "(=|!=|<|>|<=|>=|!|&&|\\|\\||\\(|\\))",
+            "name": "keyword.operator.logical"
         },
         "number": {
-            "match": "\\b[+-]?(0x[\\da-fA-F]+|[0-9]+)\\b",
+            "match": "(\\b|[+-])(0x[\\da-fA-F]+|[0-9]+)\\b",
             "name": "constant.numeric"
         },
         "tristate": {
@@ -259,28 +152,42 @@
             "begin": "\\bif\\s+",
             "end": "($|#)",
             "beginCaptures": {
-                "0": {
-                    "name": "keyword.control"
-                }
+                "0": { "name": "keyword.control" }
             },
-            "patterns": [
-                {
-                    "include": "#expression"
-                }
-            ]
+            "patterns": [{ "include": "#expression" }]
         },
         "line-continuation": {
             "begin": "\\\\$",
             "end": "^",
             "beginCaptures": {
-                "0": {
-                    "name": "constant.character.escape"
-                }
+                "0": { "name": "constant.character.escape" }
             }
         },
         "helptext": {
             "begin": "^(\\s+).*",
-            "end": "^(?!\\1)"
+            "end": "^(?!\\1)",
+            "name": "type.documentation"
+        },
+        "reference-arg-list": {
+            "match": "([^,]*)\\s*(,?)\\s*(.*)?",
+            "name": "entity.name.function.preprocessor",
+            "captures": {
+                "1": { "patterns": [{ "include": "#macro-reference" }] },
+                "2": { "name": "punctuation.separator.delimiter" },
+                "3": { "patterns": [{ "include": "#reference-arg-list" }] }
+            }
+        },
+        "macro-reference": {
+            "match": "\\$\\((.*)\\)",
+            "name": "keyword.control.directive",
+            "captures": {
+                "1": { "patterns": [{ "include": "#reference-arg-list" }] }
+            }
+        },
+        "invalid": {
+            "comment": "invalid",
+            "match": ".*",
+            "name": "invalid.illegal.unknown"
         }
     }
 }
