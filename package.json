@@ -6,13 +6,14 @@
 	"repository": {
 		"url": "https://github.com/microhobby/linuxkerneldev"
 	},
-	"version": "0.5.8",
+	"version": "0.6.0",
 	"keywords": [
 		"ctags",
 		"kernel",
 		"linux",
-		"device",
-		"tree"
+		"kconfig",
+		"device tree",
+		"buildroot"
 	],
 	"engines": {
 		"vscode": "^1.80.0"
@@ -127,6 +128,11 @@
 						"markdownDescription": "Use the experimental Device Tree Source completion and lookup engine. (⚠️ Experimental features have not been fully tested and may have unexpected behavior)",
 						"default": false
 					},
+					"kerneldev.experimental.newKconfigEngine": {
+						"type": "boolean",
+						"markdownDescription": "Use the experimental Kconfig completion and lookup engine. (⚠️ Experimental features have not been fully tested and may have unexpected behavior)",
+						"default": false
+					},
 					"kerneldev.breakBySysrq": {
 						"type": "boolean",
 						"markdownDescription": "Use serial sysrq instead ssh to break the Kernel to debug mode",
@@ -172,6 +178,55 @@
 							"${workspaceFolder}/dts/bindings",
 							"${workspaceFolder}/Documentation/devicetree/bindings"
 						]
+					}
+				}
+			},
+			{
+				"title": "Kconfig",
+				"properties": {
+					"kconfig.root": {
+						"type": "string",
+						"description": "Root kconfig file to start indexing."
+					},
+					"kconfig.env": {
+						"type": "object",
+						"description": "Mapping of environment variables to use in string insertion. Instances of $(VAR) will be replaced by their environment variable VAR's value.",
+						"patternProperties": {
+							".*": {
+								"type": "string"
+							}
+						}
+					},
+					"kconfig.conf": {
+						"type": "object",
+						"description": "Static configuration items entries as an object.",
+						"patternProperties": {
+							"^CONFIG_\\w[\\w_\\d]*": {
+								"type": [
+									"string",
+									"integer",
+									"boolean"
+								]
+							}
+						},
+						"additionalProperties": false
+					},
+					"kconfig.conf_files": {
+						"type": "array",
+						"description": "Array of properties files to always parse before the open properties file.",
+						"items": {
+							"type": "string"
+						}
+					},
+					"kconfig.cfiles": {
+						"type": "boolean",
+						"description": "Enable Kconfig hover information and go to definition in C files",
+						"default": true
+					},
+					"kconfig.disable": {
+						"type": "boolean",
+						"description": "Disable Kconfig language features",
+						"default": false
 					}
 				}
 			}
@@ -242,9 +297,24 @@
 				],
 				"filenamePatterns": [
 					"Kconfig*",
+					"Kconfig",
+					"Config.in",
+					"Config.in.*",
+					"Config.*.in"
+				],
+				"configuration": "syntaxes/kconfig-language.json"
+			},
+			{
+				"id": "defconfig",
+				"aliases": [
+					"defconfig"
+				],
+				"filenamePatterns": [
 					"*_defconfig",
-					".config*",
-					"config-*"
+					"defconfig",
+					"*.cfg",
+					".config",
+					"*.config"
 				],
 				"configuration": "syntaxes/kconfig-language.json"
 			},
@@ -267,6 +337,11 @@
 		"grammars": [
 			{
 				"language": "kconfig",
+				"scopeName": "source.kconfig",
+				"path": "./syntaxes/kconfig.tmGrammar.json"
+			},
+			{
+				"language": "defconfig",
 				"scopeName": "source.kconfig",
 				"path": "./syntaxes/kconfig.tmGrammar.json"
 			},
@@ -394,6 +469,7 @@
 		"js-yaml": "^3.13.1",
 		"textindexer": "0.0.7",
 		"await-notify": "^1.0.1",
+		"fuzzysort": "^2.0.4",
 		"@vscode/debugadapter": "^1.56.0"
 	},
 	"icon": "res/icon2.png",

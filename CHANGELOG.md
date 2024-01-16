@@ -2,7 +2,17 @@
 
 All notable changes to the "linuxkerneldev" extension will be documented in this file.
 
+## [0.6.0]
+
+- 🧪 Experimental KConfig engine
+- Minor fixes and improvements
+
+## [0.5.7]
+
+- Fix issue adding delay to the breakKernelToDebug;
+
 ## [0.5.6]
+
 - Fix issue with agent-proxy not being up;
 - Update KGDB snippets to use new KGDB extension;
 
@@ -91,7 +101,7 @@ All notable changes to the "linuxkerneldev" extension will be documented in this
 ## [0.0.3]
 
 - New keywords for marketplace search mechanism
-- Add gifs with examples of use to Readme 
+- Add gifs with examples of use to Readme
 
 ## [0.0.2]
 

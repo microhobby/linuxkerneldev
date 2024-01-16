@@ -12,6 +12,7 @@ import { LinuxNativeCommands } from './LinuxNativeCommands';
 import { DeviceTreeVSCodeDiags } from './DeviceTreeCompileVSCodeDiags';
 import { DTSEngine } from './DTSEngine';
 import { InlineDebugAdapter } from './InlineDebugAdapter';
+import { KconfigLangHandler } from './KconfigLangHandler';
 
 const tagsfile = '.vscode-ctags';
 let tags: ctags.CTags;
@@ -313,6 +314,9 @@ export function activate(context: vscode.ExtensionContext) {
 			});
 
 		const definitionsProvider = new CTagsDefinitionProvider();
+		const completionProvider = new CTagsCompletionProvider();
+		const hoverProvider = new CTagsHoverProvider();
+
 		vscode.languages.registerDefinitionProvider(
 			{ scheme: 'file', language: 'cpp' },
 			definitionsProvider
@@ -335,16 +339,28 @@ export function activate(context: vscode.ExtensionContext) {
 			);
 		}
 
-		vscode.languages.registerDefinitionProvider(
-			{ scheme: 'file', language: 'kconfig' },
-			definitionsProvider
-		);
+		if (kerneldevConfig.experimental.newKconfigEngine !== true
+			|| ctagsConfig.get<string[]>('languages', ['all']).includes('Kconfig')
+		) {
+			vscode.languages.registerDefinitionProvider(
+				{ scheme: 'file', language: 'kconfig' },
+				definitionsProvider
+			);
+			vscode.languages.registerCompletionItemProvider(
+				{ scheme: 'file', language: 'kconfig' },
+				completionProvider
+			);
+			vscode.languages.registerHoverProvider(
+				{ scheme: 'file', language: 'kconfig' },
+				hoverProvider
+			);
+		}
+
 		vscode.languages.registerDefinitionProvider(
 			{ scheme: 'file', language: 'makefile' },
 			definitionsProvider
 		);
 
-		const hoverProvider = new CTagsHoverProvider();
 		vscode.languages.registerHoverProvider(
 			{ scheme: 'file', language: 'c' },
 			hoverProvider
@@ -362,15 +378,11 @@ export function activate(context: vscode.ExtensionContext) {
 			hoverProvider
 		);
 		vscode.languages.registerHoverProvider(
-			{ scheme: 'file', language: 'kconfig' },
-			hoverProvider
-		);
-		vscode.languages.registerHoverProvider(
 			{ scheme: 'file', language: 'makefile' },
 			hoverProvider
 		);
 
-		const completionProvider = new CTagsCompletionProvider();
+
 		vscode.languages.registerCompletionItemProvider(
 			{ scheme: 'file', language: 'c' },
 			completionProvider
@@ -385,10 +397,6 @@ export function activate(context: vscode.ExtensionContext) {
 		);
 		vscode.languages.registerCompletionItemProvider(
 			{ scheme: 'file', language: 'dtsi' },
-			completionProvider
-		);
-		vscode.languages.registerCompletionItemProvider(
-			{ scheme: 'file', language: 'kconfig' },
 			completionProvider
 		);
 		vscode.languages.registerCompletionItemProvider(
@@ -546,6 +554,12 @@ export function activate(context: vscode.ExtensionContext) {
 	if (kerneldevConfig.experimental.newDtsEngine === true) {
 		const engine = new DTSEngine();
 		engine.activate(context);
+	}
+
+	if (kerneldevConfig.experimental.newKconfigEngine === true) {
+		// use the new engine
+		const kconfigHandler = new KconfigLangHandler();
+		kconfigHandler.activate(context);
 	}
 
 	// active crash debugger

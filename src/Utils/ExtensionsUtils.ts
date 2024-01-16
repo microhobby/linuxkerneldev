@@ -49,7 +49,7 @@ export class ExtensionUtils {
     }
 
     static showStatusBarLoading (title: string): void {
-        this.statusBarProgressBar.text = `$(loading~spin) Torizon: ${title}`;
+        this.statusBarProgressBar.text = `$(loading~spin) ${title}`;
         this.statusBarProgressBar.show();
     }
 
@@ -61,21 +61,21 @@ export class ExtensionUtils {
     static hideStatusBarLoading = ExtensionUtils.hideStatusBar;
 
     static showStatusBarError (message: string): void {
-        this.statusBarProgressBar.text = `$(error) Torizon: ${message}`;
+        this.statusBarProgressBar.text = `$(error) ${message}`;
         this.statusBarProgressBar.show();
     }
 
     static hideStatusBarError = ExtensionUtils.hideStatusBar;
 
     static showStatusBarWarning (message: string): void {
-        this.statusBarProgressBar.text = `$(warning) Torizon: ${message}`;
+        this.statusBarProgressBar.text = `$(warning) ${message}`;
         this.statusBarProgressBar.show();
     }
 
     static hideStatusBarWarning = ExtensionUtils.hideStatusBar;
 
     static showStatusBarOk (message: string): void {
-        this.statusBarProgressBar.text = `$(pass-filled) Torizon: ${message}`;
+        this.statusBarProgressBar.text = `$(pass-filled) ${message}`;
         this.statusBarProgressBar.show();
     }
 
