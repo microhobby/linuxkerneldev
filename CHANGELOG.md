@@ -2,6 +2,10 @@
 
 All notable changes to the "linuxkerneldev" extension will be documented in this file.
 
+## [0.6.1]
+
+- Fixed missing section about the new Kconfig engine on README.md
+
 ## [0.6.0]
 
 - 🧪 Experimental KConfig engine
