@@ -13,6 +13,26 @@ dependencies on your system:
 
 An important detail is to install universal-ctags and not exuberant-ctags to have support to index Kconfig and device tree files.
 
+## 🧪 Experimental Kconfig Engine
+
+> A new Kconfig Engine parser is in testing phase. This does not use ctags and it has a totally different behavior.
+
+To use new Kconfig Engine add the following to your `settings.json`:
+
+```json
+    "kerneldev.experimental.newKconfigEngine": true
+```
+
+Also to have the correct index to the target architecture you must add the following to your `settings.json`:
+
+```json
+    "kconfig.env": {
+        "SRCARCH": "x86" // or arm, arm64, mips, etc...
+    }
+```
+
+> ⚠️ To these settings take effect you must reload the VS Code window.
+
 ## 🧪 Experimental Device Tree Source Engine
 
 > A new DTS Engine parser is in testing phase. This does not use ctags and it has a totally different behavior showing hints and lookups just for the included files.

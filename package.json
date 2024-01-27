@@ -1,7 +1,7 @@
 {
 	"name": "linuxkerneldev",
 	"displayName": "Embedded Linux Kernel Dev",
-	"description": "Tool to help find documentation and device tree matching on device driver source code, by device tree binding compatible strings.",
+	"description": "Tool to help work with for Embedded Linux Kernel development environments. (Kernel Linux, Device Tree, Kconfig, Buildroot)",
 	"publisher": "microhobby",
 	"repository": {
 		"url": "https://github.com/microhobby/linuxkerneldev"
@@ -472,6 +472,6 @@
 		"fuzzysort": "^2.0.4",
 		"@vscode/debugadapter": "^1.56.0"
 	},
-	"icon": "res/icon2.png",
+	"icon": "res/iconRealistic.png",
 	"license": "MIT"
 }
