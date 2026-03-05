@@ -2,6 +2,10 @@
 
 All notable changes to the "linuxkerneldev" extension will be documented in this file.
 
+## [0.7.0]
+
+- Add support for `aarch64` architecture for the `agent-proxy`;
+
 ## [0.6.1]
 
 - Fixed missing section about the new Kconfig engine on README.md
