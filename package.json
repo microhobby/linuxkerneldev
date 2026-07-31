@@ -454,6 +454,9 @@
 					}
 				]
 			}
+		],
+		"extensionDependencies": [
+			"KyleMicallefBonnici.dts-lsp"
 		]
 	},
 	"scripts": {
