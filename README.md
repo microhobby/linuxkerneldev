@@ -33,46 +33,19 @@ Also to have the correct index to the target architecture you must add the follo
 
 > ⚠️ To these settings take effect you must reload the VS Code window.
 
-## 🧪 Experimental Device Tree Source Engine
+### Intgration to Devicetree LSP
 
-> A new DTS Engine parser is in testing phase. This does not use ctags and it has a totally different behavior showing hints and lookups just for the included files.
-
-### Requirements
-
-The new DTS engine validate and compile the device tree source using the device tree compiler `dtc`. Before use you must install the following
-dependencies on your system:
-
-- device-tree-compiler
-
-### Enabling Experimental DTS Engine
-
-To use new DTS Engine add the following to your `settings.json`:
+This extention automatically integrates to [Devicetree LSP](https://marketplace.visualstudio.com/items?itemName=KyleMicallefBonnici.dts-lsp). This extention continutes the follow settings.
 
 ```json
-    "kerneldev.experimental.newDtsEngine": true
+    "defaultIncludePaths": ["${workspaceFolder}/include"],
+    "defaultBindingType": "DevicetreeOrg",
 ```
 
-Changing this configuration and saving will automatically reload the extension to make effect.
+By default the paths to the `defaultDeviceOrgBindingsMetaSchema` and `defaultDeviceOrgTreeBindings` are not set.
+[Devicetree LSP](https://marketplace.visualstudio.com/items?itemName=KyleMicallefBonnici.dts-lsp) allow for the above to be  
+overriden or set by adding these in `settings.json`. See [Devicetree LSP](https://marketplace.visualstudio.com/items?itemName=KyleMicallefBonnici.dts-lsp) documentation for more.
 
-Also make sure to remove the `DTS` from the `ctags.languages`. The default configuration is:
-
-```json
-    "ctags.languages": [
-        "C",
-        "C++",
-        "DTS",
-        "Kconfig",
-        "Make"
-    ],
-```
-
-The new DTS Engine uses the `yaml` binding documentation to have completion tips and validation. The extension needs to know a valid path to documentation. If you are opening the root folder from Linux Kernel source code add the following to your `settings.json`:
-
-```json
-    "devicetree.bindings": [
-        "${workspaceFolder}/Documentation/devicetree/bindings"
-    ],
-```
 
 ## 🧪 Experimental KGDB Support
 

@@ -2,6 +2,10 @@
 
 All notable changes to the "linuxkerneldev" extension will be documented in this file.
 
+## [0.8.0]
+
+- Convert extention to integrate with `KyleMicallefBonnici.dts-lsp` as a devicetree LSP.
+
 ## [7.0.2]
 
 - Change the "breakBySysrq" setting from boolean to string, to allow more options for breaking the kernel to debug mode;
@@ -9,8 +13,6 @@ All notable changes to the "linuxkerneldev" extension will be documented in this
 ## [7.0.1]
 
 - Add a new setting to the crash utility debugger adapter to pass arguments to the crash binary;
-
-```json
 
 ## [0.7.0]
 
@@ -67,7 +69,7 @@ All notable changes to the "linuxkerneldev" extension will be documented in this
 
 ## [0.4.5]
 
-- Fix kconfig coloring for defconfig_ files
+- Fix kconfig coloring for defconfig\_ files
 
 ## [0.4.4]
 
