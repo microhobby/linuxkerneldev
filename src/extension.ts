@@ -326,19 +326,6 @@ export function activate(context: vscode.ExtensionContext) {
 			definitionsProvider
 		);
 
-		if (kerneldevConfig.experimental.newDtsEngine !== true
-			|| ctagsConfig.get<string[]>('languages', ['all']).includes('DTS')
-		) {
-			vscode.languages.registerDefinitionProvider(
-				{ scheme: 'file', language: 'dts' },
-				definitionsProvider
-			);
-			vscode.languages.registerDefinitionProvider(
-				{ scheme: 'file', language: 'dtsi' },
-				definitionsProvider
-			);
-		}
-
 		if (kerneldevConfig.experimental.newKconfigEngine !== true
 			|| ctagsConfig.get<string[]>('languages', ['all']).includes('Kconfig')
 		) {
@@ -367,14 +354,6 @@ export function activate(context: vscode.ExtensionContext) {
 		);
 		vscode.languages.registerHoverProvider(
 			{ scheme: 'file', language: 'cpp' },
-			hoverProvider
-		);
-		vscode.languages.registerHoverProvider(
-			{ scheme: 'file', language: 'dts' },
-			hoverProvider
-		);
-		vscode.languages.registerHoverProvider(
-			{ scheme: 'file', language: 'dtsi' },
 			hoverProvider
 		);
 		vscode.languages.registerHoverProvider(
@@ -517,10 +496,6 @@ export function activate(context: vscode.ExtensionContext) {
 		const config = vscode.workspace.getConfiguration('ctags');
 		const autoRegenerate = config.get<boolean>('regenerateOnSave');
 
-		if (event.languageId === "dts") {
-			DeviceTreeVSCodeDiags.compile(event.uri, diagsDTC);
-		}
-
 		if (autoRegenerate) {
 			regenerateCTags();
 		}
@@ -536,10 +511,6 @@ export function activate(context: vscode.ExtensionContext) {
 
 	vscode.window.onDidChangeActiveTextEditor(event => {
 		util.log('activaded', event?.document.fileName, event?.document.languageId);
-
-		if (event?.document.languageId === "dts") {
-			DeviceTreeVSCodeDiags.compile(event.document.uri, diagsDTC);
-		}
 	});
 
 	// xperimental https://miro.medium.com/max/910/1*snTXFElFuQLSFDnvZKJ6IA.png
@@ -551,10 +522,6 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 	});
 
-	if (kerneldevConfig.experimental.newDtsEngine === true) {
-		const engine = new DTSEngine();
-		engine.activate(context);
-	}
 
 	if (kerneldevConfig.experimental.newKconfigEngine === true) {
 		// use the new engine
