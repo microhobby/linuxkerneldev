@@ -123,11 +123,6 @@
 						"markdownDescription": "If true, then ctags/dtc/cpp will generated from the seadoglinux/utils docker image (Windows Only!)",
 						"default": false
 					},
-					"kerneldev.experimental.newDtsEngine": {
-						"type": "boolean",
-						"markdownDescription": "Use the experimental Device Tree Source completion and lookup engine. (⚠️ Experimental features have not been fully tested and may have unexpected behavior)",
-						"default": false
-					},
 					"kerneldev.experimental.newKconfigEngine": {
 						"type": "boolean",
 						"markdownDescription": "Use the experimental Kconfig completion and lookup engine. (⚠️ Experimental features have not been fully tested and may have unexpected behavior)",
@@ -322,21 +317,6 @@
 					"*.config"
 				],
 				"configuration": "syntaxes/kconfig-language.json"
-			},
-			{
-				"id": "dts",
-				"aliases": [
-					"DeviceTree"
-				],
-				"configuration": "syntaxes/devicetree-language.json",
-				"extensions": [
-					".dts",
-					".dtsi",
-					".dts_compiled",
-					".overlay",
-					".dts.pre.tmp"
-				],
-				"firstLine": "/dts-v1/;"
 			}
 		],
 		"grammars": [
@@ -349,11 +329,6 @@
 				"language": "defconfig",
 				"scopeName": "source.kconfig",
 				"path": "./syntaxes/kconfig.tmGrammar.json"
-			},
-			{
-				"language": "dts",
-				"scopeName": "source.dts",
-				"path": "./syntaxes/dts.tmLanguage.json"
 			}
 		],
 		"breakpoints": [
