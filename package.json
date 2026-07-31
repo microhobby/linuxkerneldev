@@ -452,9 +452,9 @@
 							"preLaunchTask": "${command:embeddedLinuxDev.breakKernel}"
 						}
 					}
-                ]
-            }
-        ]
+				]
+			}
+		]
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",
@@ -471,18 +471,19 @@
 		"@types/mocha": "^5.2.7",
 		"@types/node": "^12.11.7",
 		"@types/vscode": "^1.72.0",
+		"devicetree-language-server-vscode-types": "^0.0.1-alpha.38",
 		"mocha": "^10.1.0",
 		"tslint": "^5.20.0",
 		"typescript": "^4.9.3",
 		"vscode-test": "^1.2.2"
 	},
 	"dependencies": {
-		"glob": "^7.1.5",
-		"js-yaml": "^3.13.1",
-		"textindexer": "0.0.7",
+		"@vscode/debugadapter": "^1.56.0",
 		"await-notify": "^1.0.1",
 		"fuzzysort": "^2.0.4",
-		"@vscode/debugadapter": "^1.56.0"
+		"glob": "^7.1.5",
+		"js-yaml": "^3.13.1",
+		"textindexer": "0.0.7"
 	},
 	"icon": "res/iconRealistic.png",
 	"license": "MIT"
