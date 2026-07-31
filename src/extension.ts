@@ -6,11 +6,10 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import * as ctags from './ctags';
 import * as util from './util';
+import { IDeviceTreeAPI } from 'devicetree-language-server-vscode-types'
 // non ctags related
 import { LinuxDevCmdProvider, CmdOption } from './cmdNodeProvider'
 import { LinuxNativeCommands } from './LinuxNativeCommands';
-import { DeviceTreeVSCodeDiags } from './DeviceTreeCompileVSCodeDiags';
-import { DTSEngine } from './DTSEngine';
 import { InlineDebugAdapter } from './InlineDebugAdapter';
 import { KconfigLangHandler } from './KconfigLangHandler';
 
@@ -162,13 +161,24 @@ function regenerateCTags() {
 	);
 }
 
-export function activate(context: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext) {
 	const kerneldevConfig = vscode.workspace.getConfiguration('kerneldev');
 	const diagsDTC = vscode.languages.createDiagnosticCollection("dtc");
 	const ctagsConfig = vscode.workspace.getConfiguration('ctags');
 	let in_kgdb_debug_session = false;
 
 	util.log('extension activated.');
+
+	const ext = vscode.extensions.getExtension<IDeviceTreeAPI>(
+		"KyleMicallefBonnici.dts-lsp",
+	);
+	if (ext) {
+		const dtsLspApi = ext.isActive ? ext.exports : await ext.activate();
+		void dtsLspApi.setDefaultSettings({
+			defaultIncludePaths: ["${workspaceFolder}/include"],
+			defaultBindingType: "DevicetreeOrg",
+		});
+	}
 
 	// time to work
 	// tree view
