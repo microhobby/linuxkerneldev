@@ -23,6 +23,7 @@
 	],
 	"activationEvents": [
 		"onLanguage:c",
+		"onLanguage:devicetree",
 		"onLanguage:makefile",
 		"onDebugResolve:crash"
 	],
@@ -98,7 +99,6 @@
 						"default": [
 							"C",
 							"C++",
-							"DTS",
 							"Kconfig",
 							"Make"
 						]
@@ -256,27 +256,27 @@
 			"editor/context": [
 				{
 					"command": "embeddedLinuxDev.findAndOpenDeviceTreeDoc",
-					"when": "resourceLangId == c || resourceLangId == dts || resourceLangId == dtsi",
+					"when": "resourceLangId == c || resourceLangId == devicetree",
 					"group": "LinuxGroup1@1"
 				},
 				{
 					"command": "embeddedLinuxDev.findAndOpenDeviceTreeMatchDriver",
-					"when": "resourceLangId == c || resourceLangId == dts || resourceLangId == dtsi",
+					"when": "resourceLangId == c || resourceLangId == devicetree",
 					"group": "LinuxGroup1@2"
 				},
 				{
 					"command": "embeddedLinuxDev.openArmDtsDtsi",
-					"when": "resourceLangId == c || resourceLangId == dts || resourceLangId == dtsi",
+					"when": "resourceLangId == c || resourceLangId == devicetree",
 					"group": "LinuxGroup2@1"
 				},
 				{
 					"command": "embeddedLinuxDev.openArm64DtsDtsi",
-					"when": "resourceLangId == c || resourceLangId == dts || resourceLangId == dtsi",
+					"when": "resourceLangId == c || resourceLangId == devicetree",
 					"group": "LinuxGroup2@2"
 				},
 				{
 					"command": "embeddedLinuxDev.openLinuxInclude",
-					"when": "resourceLangId == c || resourceLangId == dts || resourceLangId == dtsi",
+					"when": "resourceLangId == c || resourceLangId == devicetree",
 					"group": "LinuxGroup3@1"
 				}
 			]
