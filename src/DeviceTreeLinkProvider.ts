@@ -57,20 +57,23 @@ export class DeviceTreeLinkProvider implements vscode.DocumentLinkProvider {
         const matches: Array<{ value: string, range: vscode.Range }> = [];
         const text = document.getText();
 
-        // Regex to match: compatible = "string" or compatible = "string1", "string2", ...
-        // This handles both single and multiple compatible strings
-        const compatibleRegex = /compatible\s*=\s*"([^"]+)"/g;
+        // Match the whole compatible property value list up to the terminating ';', then extract all quoted strings.
+        const propRegex = /compatible\s*=\s*([^;]*);/g;
+        let propMatch: RegExpExecArray | null;
 
-        let match: RegExpExecArray | null;
-        while ((match = compatibleRegex.exec(text)) !== null) {
-            const compatibleValue = match[1];
-            const startPos = document.positionAt(match.index + match[0].indexOf('"'));
-            const endPos = document.positionAt(match.index + match[0].indexOf('"') + compatibleValue.length + 2);
+        while ((propMatch = propRegex.exec(text)) !== null) {
+            const valuesPart = propMatch[1];
+            const valuesPartOffset = propMatch.index + propMatch[0].indexOf(valuesPart);
 
-            matches.push({
-                value: compatibleValue,
-                range: new vscode.Range(startPos, endPos)
-            });
+            const strRegex = /"([^"]+)"/g;
+            let strMatch: RegExpExecArray | null;
+            while ((strMatch = strRegex.exec(valuesPart)) !== null) {
+                const value = strMatch[1];
+                const startOffset = valuesPartOffset + strMatch.index;
+                const startPos = document.positionAt(startOffset);
+                const endPos = document.positionAt(startOffset + strMatch[0].length);
+                matches.push({ value, range: new vscode.Range(startPos, endPos) });
+            }
         }
 
         return matches;
