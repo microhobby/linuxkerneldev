@@ -119,7 +119,7 @@ export class DeviceTreeLinkProvider implements vscode.DocumentLinkProvider {
                 if (grepSlices.length >= 2) {
                     const filePath = grepSlices[0];
                     const lineNumber = grepSlices[1];
-                    const dst = vscode.Uri.parse(`${filePath}#${lineNumber}`);
+                    const dst = vscode.Uri.file(filePath).with({ fragment: lineNumber });
 
                     const link = new vscode.DocumentLink(range, dst);
                     link.tooltip = `${filePath} (driver implementation)`;
