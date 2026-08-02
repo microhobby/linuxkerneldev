@@ -169,19 +169,6 @@
 				}
 			},
 			{
-				"title": "DeviceTree",
-				"properties": {
-					"devicetree.bindings": {
-						"type": "array",
-						"description": "List of directories containing binding descriptors. Relative paths are executed from each workspace.",
-						"default": [
-							"${workspaceFolder}/dts/bindings",
-							"${workspaceFolder}/Documentation/devicetree/bindings"
-						]
-					}
-				}
-			},
-			{
 				"title": "Kconfig",
 				"properties": {
 					"kconfig.root": {
