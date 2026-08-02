@@ -4,7 +4,8 @@ All notable changes to the "linuxkerneldev" extension will be documented in this
 
 ## [0.8.0]
 
-- Convert extention to integrate with `KyleMicallefBonnici.dts-lsp` as a devicetree LSP.
+- Convert extension to integrate with `KyleMicallefBonnici.dts-lsp` as a devicetree LSP.
+- Maintain the DeviceTreeLinkProvider for backward compatibility with the old DeviceTree engine.
 
 ## [7.0.2]
 
