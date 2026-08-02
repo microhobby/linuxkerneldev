@@ -33,9 +33,9 @@ Also to have the correct index to the target architecture you must add the follo
 
 > ⚠️ To these settings take effect you must reload the VS Code window.
 
-### Intgration to Devicetree LSP
+### Integration to Devicetree LSP
 
-This extention automatically integrates to [Devicetree LSP](https://marketplace.visualstudio.com/items?itemName=KyleMicallefBonnici.dts-lsp). This extention continutes the follow settings.
+This extension automatically integrates to [Devicetree LSP](https://marketplace.visualstudio.com/items?itemName=KyleMicallefBonnici.dts-lsp). This extension contributes the following settings.
 
 ```json
     "defaultIncludePaths": ["${workspaceFolder}/include"],
@@ -43,8 +43,8 @@ This extention automatically integrates to [Devicetree LSP](https://marketplace.
 ```
 
 By default the paths to the `defaultDeviceOrgBindingsMetaSchema` and `defaultDeviceOrgTreeBindings` are not set.
-[Devicetree LSP](https://marketplace.visualstudio.com/items?itemName=KyleMicallefBonnici.dts-lsp) allow for the above to be  
-overriden or set by adding these in `settings.json`. See [Devicetree LSP](https://marketplace.visualstudio.com/items?itemName=KyleMicallefBonnici.dts-lsp) documentation for more.
+[Devicetree LSP](https://marketplace.visualstudio.com/items?itemName=KyleMicallefBonnici.dts-lsp) allow for the above to be
+overridden or set by adding these in `settings.json`. See [Devicetree LSP](https://marketplace.visualstudio.com/items?itemName=KyleMicallefBonnici.dts-lsp) documentation for more.
 
 
 ## 🧪 Experimental KGDB Support
