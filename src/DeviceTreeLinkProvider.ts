@@ -30,11 +30,17 @@ export class DeviceTreeLinkProvider implements vscode.DocumentLinkProvider {
         const compatibleMatches = this.findCompatibleStrings(document);
 
         for (const match of compatibleMatches) {
+            // Check for cancellation before processing each match
+            if (token.isCancellationRequested) {
+                return links;
+            }
+
             // Find driver implementation links
             const driverLinks = await this.createDriverLinks(
                 match.value,
                 match.range,
-                vscode.workspace.rootPath
+                vscode.workspace.rootPath,
+                token
             );
             links.push(...driverLinks);
 
@@ -42,7 +48,8 @@ export class DeviceTreeLinkProvider implements vscode.DocumentLinkProvider {
             const docLinks = await this.createDocumentationLinks(
                 match.value,
                 match.range,
-                vscode.workspace.rootPath
+                vscode.workspace.rootPath,
+                token
             );
             links.push(...docLinks);
         }
@@ -85,9 +92,15 @@ export class DeviceTreeLinkProvider implements vscode.DocumentLinkProvider {
     private async createDriverLinks(
         compatible: string,
         range: vscode.Range,
-        rootPath: string
+        rootPath: string,
+        token: vscode.CancellationToken
     ): Promise<vscode.DocumentLink[]> {
         const links: vscode.DocumentLink[] = [];
+
+        // Check for cancellation
+        if (token.isCancellationRequested) {
+            return links;
+        }
 
         // Check cache first
         const cachedMatch = CompatibleMatchCache.Cache.find(
@@ -160,9 +173,15 @@ export class DeviceTreeLinkProvider implements vscode.DocumentLinkProvider {
     private async createDocumentationLinks(
         compatible: string,
         range: vscode.Range,
-        rootPath: string
+        rootPath: string,
+        token: vscode.CancellationToken
     ): Promise<vscode.DocumentLink[]> {
         const links: vscode.DocumentLink[] = [];
+
+        // Check for cancellation
+        if (token.isCancellationRequested) {
+            return links;
+        }
 
         // Check cache first
         const cachedDocMatch = CompatibleMatchCache.DocCache.find(
@@ -199,6 +218,11 @@ export class DeviceTreeLinkProvider implements vscode.DocumentLinkProvider {
                 const lines = fileMatch.trim().split("\n");
 
                 for (const line of lines) {
+                    // Check for cancellation during line processing
+                    if (token.isCancellationRequested) {
+                        return links;
+                    }
+
                     if (line.trim() === "") continue;
 
                     const colonIndex = line.indexOf(":");
