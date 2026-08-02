@@ -1,8 +1,6 @@
 #!/bin/bash
 
 # find
-grep -rs $2 $1/Documentation/devicetree/bindings/
-#fileList=(${grepRet//:/ })
-#fileList=$grepRet
+grepRet=$(grep -rs $2 $1/Documentation/devicetree/bindings/)
 
-#echo $grepRet
+echo $grepRet

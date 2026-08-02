@@ -12,6 +12,7 @@ import { LinuxDevCmdProvider, CmdOption } from './cmdNodeProvider'
 import { LinuxNativeCommands } from './LinuxNativeCommands';
 import { InlineDebugAdapter } from './InlineDebugAdapter';
 import { KconfigLangHandler } from './KconfigLangHandler';
+import { DeviceTreeLinkProvider } from './DeviceTreeLinkProvider';
 
 const tagsfile = '.vscode-ctags';
 let tags: ctags.CTags;
@@ -538,6 +539,13 @@ export async function activate(context: vscode.ExtensionContext) {
 		const kconfigHandler = new KconfigLangHandler();
 		kconfigHandler.activate(context);
 	}
+
+	// Register Device Tree DocumentLink Provider
+	const deviceTreeLinkProvider = new DeviceTreeLinkProvider();
+	const deviceTreeSelector = { language: 'devicetree', scheme: 'file' };
+	context.subscriptions.push(
+		vscode.languages.registerDocumentLinkProvider(deviceTreeSelector, deviceTreeLinkProvider)
+	);
 
 	// active crash debugger
     InlineDebugAdapter.Activate(context);
