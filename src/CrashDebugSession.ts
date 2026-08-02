@@ -15,6 +15,7 @@ interface ILaunchRequestArguments extends DebugProtocol.LaunchRequestArguments {
     crash: string;
     vmlinux: string;
     vmcore: string;
+    crashArgs: string;
 }
 
 export class CrashDebugSession extends LoggingDebugSession {
@@ -164,7 +165,7 @@ export class CrashDebugSession extends LoggingDebugSession {
         await this._configurationDone.wait(5000);
 
         // start the program in the runtime
-        await this._runtime.start(args.crash, args.vmlinux, args.vmcore);
+        await this._runtime.start(args.crash, args.vmlinux, args.vmcore, args.crashArgs);
     }
 
     protected setFunctionBreakPointsRequest (

@@ -270,10 +270,10 @@ export class LinuxNativeCommands {
 	async breakKernelToDebug(_delay: number = 5000): Promise<boolean>
 	{
 		const bySysrq =  vscode.workspace
-			.getConfiguration('kerneldev').get<boolean>("breakBySysrq");
+			.getConfiguration('kerneldev').get<string>("breakBySysrq");
 
 		try {
-			if (!bySysrq) {
+			if (bySysrq === "ssh") {
 				return new Promise(resolve => {
 					const sshIp = this._checkForSetting("ssh_ip");
 					const sshPsswd = this._checkForSetting("ssh_psswd");
@@ -315,7 +315,14 @@ export class LinuxNativeCommands {
 						});
 					});
 				});
-			} else {
+			} else if (bySysrq === "serial") {
+				await ExtensionUtils.delay(500);
+
+				if (this._serialTerminal != null) {
+					// send the g directly
+					this._serialTerminal.sendText(`echo g > /proc/sysrq-trigger\n`);
+				}
+			} else if (bySysrq === "break") {
 				await ExtensionUtils.delay(500);
 
 				if (this._serialTerminal != null) {

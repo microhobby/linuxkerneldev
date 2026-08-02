@@ -2,6 +2,16 @@
 
 All notable changes to the "linuxkerneldev" extension will be documented in this file.
 
+## [7.0.2]
+
+- Change the "breakBySysrq" setting from boolean to string, to allow more options for breaking the kernel to debug mode;
+
+## [7.0.1]
+
+- Add a new setting to the crash utility debugger adapter to pass arguments to the crash binary;
+
+```json
+
 ## [0.7.0]
 
 - Add support for `aarch64` architecture for the `agent-proxy`;

@@ -119,31 +119,43 @@ There are some properties that need attention:
 - `preLaunchTask`
     - Do not remove the command `${command:embeddedLinuxDev.breakKernel}`. If you need to add a custom task for your use case, don't forget to add the command call in the tasks pipeline as the last task to be executed. Is this command that initializes the `agent-proxy` that will share what is from `gdb` and what is from the session console;
 
-Para realizar o break do Kernel para inicializar a sessão de debug e enviar corretamente os breakpoints requeridos o comando `embeddedLinuxDev.breakKernel` precisa de alguns settings. São nexessários:
+To break the kernel in order to initialize the debug session and correctly send the required breakpoints, the `embeddedLinuxDev.breakKernel` command needs some settings. These are necessary:
 
 ```json
     "kerneldev.kgdb_port": "6061",
     "kerneldev.serial_port": "6060",
 ```
 
-Essas portas serão utitilizadas pelo `agent-proxy` para criar sessões telnet para distribuir o que é do `gdb` e o que é do console normal do linux.
+These ports will be used by `agent-proxy` to create telnet sessions to distribute what comes from `gdb` and what comes from the normal Linux console.
 
-O modo recomendado de colocar o Kernel Linux em modo de debug e por `Linux Magic System Request Key Hacks`:
+The recommended way to put the Linux Kernel in debug mode is by using `Linux Magic System Request Key Hacks`:
 
 ```json
-    "kerneldev.breakBySysrq": true
+    "kerneldev.breakBySysrq": "break"
 ```
 
-Mas caso queira executar o break via `ssh` use:
+But if you want to execute the break via `ssh`, use:
 
-> ⚠️ Executar o break via `ssh` é especialmente útil quando o seu device serial não suporta `BREAK`
+> ⚠️ Executing the break via `ssh` is especially useful when your serial device does not support `BREAK`
 
 ```json
-    "kerneldev.breakBySysrq": false,
+    "kerneldev.breakBySysrq": "ssh",
     "kerneldev.ssh_login": "seadog",
     "kerneldev.ssh_psswd": "seadog",
     "kerneldev.ssh_ip": "192.168.0.53",
 ```
+
+And if you want to execute the break via `serial`, use:
+
+```json
+    "kerneldev.breakBySysrq": "serial",
+    "kerneldev.serial_port": "6060",
+```
+
+> ⚠️ For this mode work you need to leave a previous serial connection logged in.
+
+> ⚠️ Executing the break via `serial` is especially useful when your serial device supports `BREAK` and you want a more direct way to send the break command without the overhead of `ssh`.
+
 
 ## 🧪 Experimental Crash Utility Debugger Adapter
 

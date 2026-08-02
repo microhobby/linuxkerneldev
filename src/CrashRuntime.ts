@@ -17,12 +17,13 @@ export class CrashRuntime extends EventEmitter {
     // no need useless constructor
 
     public async start (
-        crash: string, vmlinux: string, vmcore: string
+        crash: string, vmlinux: string, vmcore: string, crashArgs: string
     ): Promise<void> {
         this._crash = new CrashUtility(
             crash,
             vmlinux,
-            vmcore
+            vmcore,
+            crashArgs
         );
 
         return await new Promise(resolve => {
