@@ -7,6 +7,7 @@ import * as vscode from 'vscode';
 import * as ctags from './ctags';
 import * as util from './util';
 import { IDeviceTreeAPI } from 'devicetree-language-server-vscode-types'
+import { BindingType } from 'devicetree-language-server-types';
 // non ctags related
 import { LinuxDevCmdProvider, CmdOption } from './cmdNodeProvider'
 import { LinuxNativeCommands } from './LinuxNativeCommands';
@@ -174,11 +175,27 @@ export async function activate(context: vscode.ExtensionContext) {
 		"KyleMicallefBonnici.dts-lsp",
 	);
 	if (ext) {
-		const dtsLspApi = ext.isActive ? ext.exports : await ext.activate();
-		void dtsLspApi.setDefaultSettings({
-			defaultIncludePaths: ["${workspaceFolder}/include"],
-			defaultBindingType: "DevicetreeOrg",
-		});
+		// Only seed defaults when the user/workspace hasn't already
+		// configured devicetree.* themselves — otherwise this clobbers
+		// their own settings (e.g. devicetree.cwd + defaultIncludePaths)
+		// and breaks the LSP's context resolution, killing completions.
+		const devicetreeConfig = vscode.workspace.getConfiguration('devicetree');
+		const isUserConfigured = (key: string): boolean => {
+			const inspected = devicetreeConfig.inspect(key);
+			return !!(inspected?.globalValue
+				?? inspected?.workspaceValue
+				?? inspected?.workspaceFolderValue);
+		};
+
+		if (!isUserConfigured('defaultIncludePaths')
+			&& !isUserConfigured('defaultBindingType')
+		) {
+			const dtsLspApi = ext.isActive ? ext.exports : await ext.activate();
+			void dtsLspApi.setDefaultSettings({
+				defaultIncludePaths: ["${workspaceFolder}/include"],
+				defaultBindingType: "" as BindingType,
+			});
+		}
 	}
 
 	// time to work
@@ -379,14 +396,6 @@ export async function activate(context: vscode.ExtensionContext) {
 		);
 		vscode.languages.registerCompletionItemProvider(
 			{ scheme: 'file', language: 'cpp' },
-			completionProvider
-		);
-		vscode.languages.registerCompletionItemProvider(
-			{ scheme: 'file', language: 'dts' },
-			completionProvider
-		);
-		vscode.languages.registerCompletionItemProvider(
-			{ scheme: 'file', language: 'dtsi' },
 			completionProvider
 		);
 		vscode.languages.registerCompletionItemProvider(

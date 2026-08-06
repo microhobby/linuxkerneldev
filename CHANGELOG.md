@@ -2,6 +2,11 @@
 
 All notable changes to the "linuxkerneldev" extension will be documented in this file.
 
+## [0.8.1]
+
+- Fix override of the devicetree tree settings on the `KyleMicallefBonnici.dts-lsp` extension.
+- Fix `KyleMicallefBonnici.dts-lsp` not showing completions for devicetree.
+
 ## [0.8.0]
 
 - Convert extension to integrate with `KyleMicallefBonnici.dts-lsp` as a devicetree LSP.
