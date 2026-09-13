@@ -447,7 +447,7 @@
 		"await-notify": "^1.0.1",
 		"fuzzysort": "^2.0.4",
 		"glob": "^7.1.5",
-		"js-yaml": "^3.13.1",
+		"js-yaml": "^3.15.2",
 		"textindexer": "0.0.7"
 	},
 	"icon": "res/iconRealistic.png",
